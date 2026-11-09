@@ -1,425 +1,81 @@
-<!DOCTYPE html>
-<html lang='en'>
-<!-- 
-Simple Image2VLW converter
-by Oliver Weyhmüller
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>OEPL-Toolbox</title><script src="js/theme.js" data-theme-init></script><link rel="stylesheet" href="style.css"><script defer src="vendor/jpeg-encoder.js"></script><script defer src="js/locales/en.js"></script><script defer src="js/i18n.js"></script><script defer src="js/activity.js"></script><script defer src="js/color-info.js"></script><script defer src="js/gamut.js"></script><script defer src="js/fixed-mix.js"></script><script defer src="js/image-converter.js"></script><script defer src="js/illustration.js"></script><script defer src="js/image-api.js"></script><script defer src="js/core.js"></script><script defer src="js/ap.js"></script><script defer src="js/crop.js"></script><script defer src="js/font-codec.js"></script><script defer src="js/pixel-font.js"></script><script defer src="js/test-pattern.js"></script><script defer src="js/drawing-core.js"></script><script defer src="js/drawing-ui.js"></script><script defer src="js/preview-filter.js"></script><script defer src="js/clipboard.js"></script><script defer src="js/preview-navigation.js"></script><script defer src="js/method-guide.js"></script><script defer src="js/app.js"></script><script defer src="js/led-core.js"></script><script defer src="js/led-ui.js"></script></head>
+<body><header><a class="brand" href="img2vlw.html"><span class="mark">OT</span> OEPL-Toolbox <small>E-PAPER &amp; LED</small></a><div class="headerTools"><span class="badge"><span data-i18n="Lokale Verarbeitung im Browser">Lokale Verarbeitung im Browser</span></span><label class="themeLabel"><span data-i18n="Darstellung">Darstellung</span><select id="theme" aria-label="Darstellung" data-i18n-aria-label="Darstellung"><option value="auto" data-i18n="Automatisch">Automatisch</option><option value="light" data-i18n="Hell">Hell</option><option value="dark" data-i18n="Dunkel">Dunkel</option></select></label><label class="languageLabel"><span data-i18n="Sprache">Sprache</span><select id="language" aria-label="Sprache" data-i18n-aria-label="Sprache"><option value="de">Deutsch</option><option value="en">English</option></select></label></div></header><main><nav class="toolnav" aria-label="Werkzeuge" data-i18n-aria-label="Werkzeuge"><button id="imageTool" class="active" aria-pressed="true"><span data-i18n="Bildstudio">Bildstudio</span></button><button id="ledTool" aria-pressed="false"><span data-i18n="LED-Designer">LED-Designer</span></button></nav>
+<div class="intro"><div><p class="eyebrow"><span data-i18n="BILDBEARBEITUNG">BILDBEARBEITUNG</span></p><h1><span data-i18n="Bilder für E-Paper-Displays">Bilder für E-Paper-Displays</span></h1><p><span data-i18n="Bilder zuschneiden, skalieren, Farben zuordnen und an OpenEPaperLink übertragen.">Bilder zuschneiden, skalieren, Farben zuordnen und an OpenEPaperLink übertragen.</span></p></div><div class="sourceInputs"><label class="upload"><span data-i18n="＋ Bild oder VLW öffnen">＋ Bild oder VLW öffnen</span><input id="file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/gif,.vlw,.gz,application/gzip"></label><button id="pasteSource" type="button" title="Als Quellbild einfügen" data-i18n-title="Als Quellbild einfügen"><span data-i18n="Bild aus Zwischenablage">Bild aus Zwischenablage</span></button></div></div>
+<div id="notice" role="status" aria-live="polite"><span data-i18n="Bilddatei öffnen oder Beispiel laden.">Bilddatei öffnen oder Beispiel laden.</span></div>
+<div class="workspace"><aside id="settings">
+<section><h2><span>01</span> <span data-i18n="Display &amp; Farben">Display &amp; Farben</span></h2><label><span data-i18n="Farbpalette">Farbpalette</span><select id="palette"></select></label><div id="colors"></div><details><summary data-i18n="Farblegende">Farblegende</summary><p id="colorLegend" class="hint"></p></details>
+<details><summary><span data-i18n="Eigene Farbpresets">Eigene Farbpresets</span></summary><p class="hint"><span data-i18n="2–16 unterschiedliche Hex-Farben mit Komma trennen. Reihenfolge frei; Weiß ist optional.">2–16 unterschiedliche Hex-Farben mit Komma trennen. Reihenfolge frei; Weiß ist optional.</span></p><label><span data-i18n="Farben">Farben</span><input id="customColors" value="#ffffff, #000000, #ff0000, #ffff00"></label><label><span data-i18n="Preset-Name">Preset-Name</span><input id="presetName" placeholder="Name des Farbpresets" maxlength="60" data-i18n-placeholder="Name des Farbpresets"></label><div class="row"><button id="savePreset"><span data-i18n="Speichern">Speichern</span></button><button id="deletePreset"><span data-i18n="Preset löschen">Preset löschen</span></button></div></details>
+<label><span data-i18n="Displaygröße">Displaygröße</span><select id="size"><option value="custom" data-i18n="Eigene Abmessungen">Eigene Abmessungen</option><option value="152x152" data-i18n="1,54″ · 152 × 152">1,54″ · 152 × 152</option><option value="200x200" data-i18n="1,54″ · 200 × 200">1,54″ · 200 × 200</option><option value="250x122" data-i18n="2,13″ · 250 × 122">2,13″ · 250 × 122</option><option value="296x128" selected data-i18n="2,9″ · 296 × 128">2,9″ · 296 × 128</option><option value="400x300" data-i18n="4,2″ · 400 × 300">4,2″ · 400 × 300</option><option value="600x448" data-i18n="5,65″ · 600 × 448">5,65″ · 600 × 448</option><option value="648x480" data-i18n="5,83″ · 648 × 480">5,83″ · 648 × 480</option><option value="800x480" data-i18n="7,5″ · 800 × 480">7,5″ · 800 × 480</option><option value="960x640" data-i18n="9,7″ · 960 × 640">9,7″ · 960 × 640</option></select></label>
+<div class="row"><label><span data-i18n="Breite">Breite</span><input id="width" type="number" min="1" max="4096" value="296"></label><button id="swap" aria-label="Breite und Höhe tauschen" data-i18n-aria-label="Breite und Höhe tauschen">⇄</button><label><span data-i18n="Höhe">Höhe</span><input id="height" type="number" min="1" max="4096" value="128"></label></div><label class="check"><input id="aspect" type="checkbox"> <span data-i18n="Seitenverhältnis beim Ändern halten">Seitenverhältnis beim Ändern halten</span></label><label><span data-i18n="Ausgabedisplay drehen">Ausgabedisplay drehen</span><select id="viewRotation"><option value="0" data-i18n="0° · Original">0° · Original</option><option value="90" data-i18n="90° · nach rechts">90° · nach rechts</option><option value="180" data-i18n="180° · gedreht">180° · gedreht</option><option value="270" data-i18n="270° · nach links">270° · nach links</option></select></label><p class="hint"><span data-i18n="Dreht die Zielansicht. Quelle und Ausschnitt bleiben unverändert. Die Übertragung erfolgt im originalen Displayformat.">Dreht die Zielansicht. Quelle und Ausschnitt bleiben unverändert. Die Übertragung erfolgt im originalen Displayformat.</span></p></section>
+<section><h2><span>02</span> <span data-i18n="Ausschnitt &amp; Skalierung">Ausschnitt &amp; Skalierung</span></h2><label class="check"><input id="transparent" type="checkbox" checked> <span data-i18n="Transparenz erhalten">Transparenz erhalten</span></label><label><span data-i18n="Einpassen">Einpassen</span><select id="fit"><option value="free" data-i18n="Frei skalieren und positionieren">Frei skalieren und positionieren</option><option value="native" data-i18n="1:1 · ohne Skalierung">1:1 · ohne Skalierung</option><option value="contain" selected data-i18n="Vollständig · mit Rändern">Vollständig · mit Rändern</option><option value="cover" data-i18n="Fläche füllen · mittig beschneiden">Fläche füllen · mittig beschneiden</option><option value="stretch" data-i18n="Auf Zielgröße strecken">Auf Zielgröße strecken</option></select></label><p class="hint" data-i18n="1:1 erhält die Pixelgröße. Mit freier Skalierung lässt sich die Größe in Prozent ändern. In beiden Modi kann das Bild in der Zielvorschau gezogen werden. Überstehende Teile werden abgeschnitten; Displaygröße und Farbkonvertierung bleiben erhalten.">1:1 erhält die Pixelgröße. Mit freier Skalierung lässt sich die Größe in Prozent ändern. In beiden Modi kann das Bild in der Zielvorschau gezogen werden. Überstehende Teile werden abgeschnitten; Displaygröße und Farbkonvertierung bleiben erhalten.</p><div id="placementControls" hidden><label><span data-i18n="Bildskalierung">Bildskalierung</span><output id="imageScaleValue">100 %</output><input id="imageScale" type="range" min="1" max="400" value="100" step="1"></label><div class="row"><label><span data-i18n="Versatz X (px)">Versatz X (px)</span><input id="offsetX" type="number" min="-4096" max="4096" step="1" value="0"></label><label><span data-i18n="Versatz Y (px)">Versatz Y (px)</span><input id="offsetY" type="number" min="-4096" max="4096" step="1" value="0"></label></div><button id="centerImage" data-i18n="Bild zentrieren">Bild zentrieren</button><p class="hint" data-i18n="Versatz relativ zur Mitte. Der Prozentregler wechselt zur freien Skalierung. Der Ansichtszoom verändert nur die Vorschau.">Versatz relativ zur Mitte. Der Prozentregler wechselt zur freien Skalierung. Der Ansichtszoom verändert nur die Vorschau.</p></div><div class="row"><label><span data-i18n="Quellbild drehen">Quellbild drehen</span><select id="rotation"><option value="0">0°</option><option value="90">90°</option><option value="180">180°</option><option value="270">270°</option></select></label><label><span data-i18n="Interpolation">Interpolation</span><select id="smooth"><option value="yes" data-i18n="Glatt">Glatt</option><option value="no" data-i18n="Pixelgenau">Pixelgenau</option></select></label></div>
+<label class="check"><input id="cropMode" type="checkbox"> <span data-i18n="Ausschnitt im Quellbild markieren">Ausschnitt im Quellbild markieren</span></label><label class="check"><input id="cropAspect" type="checkbox"> <span data-i18n="Ausschnitt an Display-Seitenverhältnis binden">Ausschnitt an Display-Seitenverhältnis binden</span></label><button id="newCrop" type="button" aria-pressed="false"><span data-i18n="Neuen Ausschnitt markieren">Neuen Ausschnitt markieren</span></button><p class="hint"><span data-i18n="Zum Bearbeiten die Ausschnittauswahl aktivieren: innen ziehen zum Verschieben, Ziehpunkte zum Vergrößern oder Verkleinern. Die Bindung berücksichtigt die Displayausrichtung.">Zum Bearbeiten die Ausschnittauswahl aktivieren: innen ziehen zum Verschieben, Ziehpunkte zum Vergrößern oder Verkleinern. Die Bindung berücksichtigt die Displayausrichtung.</span></p><div class="cropgrid"><label>X<input id="cropX" type="number" step="any" min="0" value="0"></label><label>Y<input id="cropY" type="number" step="any" min="0" value="0"></label><label><span data-i18n="Breite">Breite</span><input id="cropW" type="number" step="any" min="1" value="1"></label><label><span data-i18n="Höhe">Höhe</span><input id="cropH" type="number" step="any" min="1" value="1"></label></div><div class="row"><button id="resetCrop"><span data-i18n="Ausschnitt zurücksetzen">Ausschnitt zurücksetzen</span></button><button id="originalSize" title="Setzt die Zielgröße auf die Pixelmaße des Quellausschnitts und die Ansicht auf „Einpassen“. Die Displayabmessungen werden dabei geändert." data-i18n-title="Setzt die Zielgröße auf die Pixelmaße des Quellausschnitts und die Ansicht auf „Einpassen“. Die Displayabmessungen werden dabei geändert."><span data-i18n="Ausschnittgröße (1:1)">Ausschnittgröße (1:1)</span></button></div></section>
+<section><h2><span>03</span> <span data-i18n="Farbzuordnung">Farbzuordnung</span></h2>
+<label class="check"><input id="invert" type="checkbox"> <span data-i18n="Schwarz und Weiß invertieren">Schwarz und Weiß invertieren</span></label><p class="hint"><span data-i18n="Akzentfarben und Transparenz bleiben erhalten.">Akzentfarben und Transparenz bleiben erhalten.</span></p><label><span data-i18n="Helligkeit">Helligkeit</span> <output id="brightnessValue">0</output><input id="brightness" type="range" min="-128" max="128" value="0"></label><label><span data-i18n="Kontrast">Kontrast</span> <output id="contrastValue">1</output><input id="contrast" type="range" min="0.2" max="3" step="0.05" value="1"></label><label><span data-i18n="Sättigung">Sättigung</span> <output id="saturationValue">1</output><input id="saturation" type="range" min="0" max="2" step="0.05" value="1"></label><label><span data-i18n="Hell-Dunkel-Schwelle">Hell-Dunkel-Schwelle</span> <output id="thresholdValue">128</output><input id="threshold" type="range" min="1" max="254" value="128"></label>
+<details><summary><span data-i18n="Einzelne Farben bevorzugen">Einzelne Farben bevorzugen</span></summary><p class="hint"><span data-i18n="Positive Werte vergrößern den Zuordnungsbereich der Farbe, negative verkleinern ihn.">Positive Werte vergrößern den Zuordnungsbereich der Farbe, negative verkleinern ihn.</span></p><div id="biases"></div></details><label><span data-i18n="Farbausgabe">Farbausgabe</span><select id="dither"><option value="rgb" data-i18n="Farbstufen erhalten · RGB">Farbstufen erhalten · RGB</option><option value="gamut" data-i18n="Farbstufen erhalten · Palettenfarbraum">Farbstufen erhalten · Palettenfarbraum</option><option value="fixed" data-i18n="Farbflächen · feste Mischfarben">Farbflächen · feste Mischfarben</option><option value="none" selected data-i18n="Ohne · klare Flächen &amp; Text">Ohne · klare Flächen & Text</option><option value="floyd" data-i18n="Floyd–Steinberg · Fotos">Floyd–Steinberg · Fotos</option><option value="ordered" data-i18n="Bayer 4 × 4 · regelmäßiges Raster">Bayer 4 × 4 · regelmäßiges Raster</option></select></label><div id="fixedMixControls" hidden><label><span data-i18n="Displayfarben pro Mischton (höchstens)">Displayfarben pro Mischton (höchstens)</span><select id="mixColors"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select></label><p class="hint" data-i18n="Reine Farben und gleichmäßige Mischungen bis zur gewählten Anzahl. Jeder Mischton erhält ein festes 1-Pixel-Muster, ohne Zwischenverhältnisse oder Fehlerdiffusion. Kleine Farbschwankungen innerhalb derselben Stufe ändern das Muster nicht. Der Verlauf wird stufig; vorhandenes Bildrauschen kann weiterhin Stufenwechsel verursachen.">Reine Farben und gleichmäßige Mischungen bis zur gewählten Anzahl. Jeder Mischton erhält ein festes 1-Pixel-Muster, ohne Zwischenverhältnisse oder Fehlerdiffusion. Kleine Farbschwankungen innerhalb derselben Stufe ändern das Muster nicht. Der Verlauf wird stufig; vorhandenes Bildrauschen kann weiterhin Stufenwechsel verursachen.</p></div><p id="continuousHint" class="hint" hidden><span data-i18n="Farbstufen bleiben ohne Raster erhalten. RGB übernimmt alle Farben; Palettenfarbraum begrenzt sie auf darstellbare Mischfarben der Palette. Farbkorrekturen bleiben aktiv, Einzel-Farbgewichtung und Dither-Stärke entfallen. Invertieren kehrt alle RGB-Kanäle um. PNG/JPEG speichern diese Vorbereitung; die endgültige Darstellung bestimmt der AP. VLW ist hier nicht verfügbar.">Farbstufen bleiben ohne Raster erhalten. RGB übernimmt alle Farben; Palettenfarbraum begrenzt sie auf darstellbare Mischfarben der Palette. Farbkorrekturen bleiben aktiv, Einzel-Farbgewichtung und Dither-Stärke entfallen. Invertieren kehrt alle RGB-Kanäle um. PNG/JPEG speichern diese Vorbereitung; die endgültige Darstellung bestimmt der AP. VLW ist hier nicht verfügbar.</span></p><label id="apDitherChoice" hidden><span data-i18n="Dithering beim Direktversand (AP)">Dithering beim Direktversand (AP)</span><select id="apDither"><option value="0" data-i18n="Ohne">Ohne</option><option value="1" selected>Floyd–Steinberg</option><option value="2" data-i18n="Geordnetes Raster">Geordnetes Raster</option></select></label><p id="quantizedHint" class="hint"><span data-i18n="Wahrnehmungsorientierte Farbzuordnung bei jeder Stärke. Weniger Stärke reduziert das Raster in Richtung „Ohne“; Bayer 4×4 kann dabei sichtbare Stufen zeigen.">Wahrnehmungsorientierte Farbzuordnung bei jeder Stärke. Weniger Stärke reduziert das Raster in Richtung „Ohne“; Bayer 4×4 kann dabei sichtbare Stufen zeigen.</span></p><label><span data-i18n="Dither-Stärke">Dither-Stärke</span> <output id="strengthValue">1</output><input id="strength" type="range" min="0" max="1" step="0.05" value="1"></label><button id="resetAdjustments"><span data-i18n="Farbregler zurücksetzen">Farbregler zurücksetzen</span></button></section><section id="illustrationPanel"><h2 data-i18n="Linien und Schrift optimieren">Linien und Schrift optimieren</h2><label><span data-i18n="Optimierungspreset">Optimierungspreset</span><select id="optPreset"><option value="off" data-i18n="Aus">Aus</option><option value="comic" data-i18n="Comic">Comic</option><option value="diagram" data-i18n="Diagramm">Diagramm</option><option value="text" data-i18n="Nur Text verbessern">Nur Text verbessern</option><option value="custom" data-i18n="Eigene Einstellungen">Eigene Einstellungen</option></select></label><div class="optimizationControl"><label class="check"><input id="optDark" type="checkbox"><span data-i18n="Dunkle Konturen schützen">Dunkle Konturen schützen</span></label><label><span data-i18n="Stärke">Stärke</span> <output id="optDarkStrengthValue">50 %</output><input id="optDarkStrength" type="range" min="0" max="100" step="1" value="50" disabled></label></div><div class="optimizationControl"><label class="check"><input id="optColor" type="checkbox"><span data-i18n="Farbige dünne Linien schützen">Farbige dünne Linien schützen</span></label><label><span data-i18n="Stärke">Stärke</span> <output id="optColorStrengthValue">50 %</output><input id="optColorStrength" type="range" min="0" max="100" step="1" value="50" disabled></label></div><div class="optimizationControl"><label class="check"><input id="optText" type="checkbox"><span data-i18n="Schrift auf hellem Hintergrund schützen">Schrift auf hellem Hintergrund schützen</span></label><label><span data-i18n="Stärke">Stärke</span> <output id="optTextStrengthValue">50 %</output><input id="optTextStrength" type="range" min="0" max="100" step="1" value="50" disabled></label></div><div class="optimizationControl"><label class="check"><input id="optSmooth" type="checkbox"><span data-i18n="Farbflächen beruhigen">Farbflächen beruhigen</span></label><label><span data-i18n="Stärke">Stärke</span> <output id="optSmoothStrengthValue">50 %</output><input id="optSmoothStrength" type="range" min="0" max="100" step="1" value="50" disabled></label></div><p class="hint" data-i18n="Wirkt auf das Quellbild vor der Zeichenebene. Die reguläre Vorschau zeigt das Ergebnis. Hohe Stärken können kleine Buchstaben schließen oder Linien verdicken. Farbige Linien werden nur bei passender Displayfarbe gezielt geschützt; helle Textflächen werden automatisch angenähert.">Wirkt auf das Quellbild vor der Zeichenebene. Die reguläre Vorschau zeigt das Ergebnis. Hohe Stärken können kleine Buchstaben schließen oder Linien verdicken. Farbige Linien werden nur bei passender Displayfarbe gezielt geschützt; helle Textflächen werden automatisch angenähert.</p><button id="optReset" data-i18n="Optimierungen ausschalten">Optimierungen ausschalten</button></section></aside>
+<div class="stage"><section class="previewPanel"><div class="paneltop"><h2><span data-i18n="Quelle und Ausgabe">Quelle und Ausgabe</span></h2></div>
+<div class="previewWorkspaceTools"><label><span data-i18n="Maus / Touch">Maus / Touch</span><select id="previewInteraction"><option value="auto" data-i18n="Automatisch">Automatisch</option><option value="pan" data-i18n="Ansicht verschieben">Ansicht verschieben</option></select></label><label><span data-i18n="Bildbereich (% Fensterhöhe)">Bildbereich (% Fensterhöhe)</span><output id="previewHeightValue">55 %</output><input id="previewHeight" type="range" min="25" max="85" step="5" value="55"></label><button id="expandWorkspace" type="button" aria-pressed="false" data-i18n="Arbeitsansicht vergrößern">Arbeitsansicht vergrößern</button></div><p class="hint navigationHint" data-i18n="Ansicht: ziehen zum Verschieben, Strg + Mausrad zum Zoomen; Mitteltaste oder Leertaste + Ziehen auch beim Zeichnen. Touch: zwei Finger zum Verschieben und Zoomen. Ausschnittwahl, Zeichenwerkzeuge und Bildpositionierung haben im Automatikmodus Vorrang. Nur Anzeige; kein Einfluss auf Export.">Ansicht: ziehen zum Verschieben, Strg + Mausrad zum Zoomen; Mitteltaste oder Leertaste + Ziehen auch beim Zeichnen. Touch: zwei Finger zum Verschieben und Zoomen. Ausschnittwahl, Zeichenwerkzeuge und Bildpositionierung haben im Automatikmodus Vorrang. Nur Anzeige; kein Einfluss auf Export.</p><details id="methodGuide" class="testPatternControls"><summary data-i18n="Dithering und Optimierungen · Beispiele">Dithering und Optimierungen · Beispiele</summary><p class="hint" data-i18n="Eingebaute Beispielgrafik mit der aktuellen Palette. Vergleich bei voller Dither-Stärke; feste Mischfarben mit höchstens zwei Farben. Die Beispielbilder zeigen nicht die aktuellen Bildkorrekturen. RGB und Palettenfarbraum sind Vorbereitungen, keine fertige Displayausgabe.">Eingebaute Beispielgrafik mit der aktuellen Palette. Vergleich bei voller Dither-Stärke; feste Mischfarben mit höchstens zwei Farben. Die Beispielbilder zeigen nicht die aktuellen Bildkorrekturen. RGB und Palettenfarbraum sind Vorbereitungen, keine fertige Displayausgabe.</p><div id="methodExamples"></div></details><details id="testPatternPanel" class="testPatternControls"><summary data-i18n="Test- und Beispielbilder">Test- und Beispielbilder</summary><div class="row wrap"><label><span data-i18n="Testbild-Bereich">Testbild-Bereich</span><select id="testPatternMode"><option value="noise" data-i18n="Farbrauschen (Vollbild)">Farbrauschen (Vollbild)</option><option value="solid" data-i18n="Vollfarbe (Vollbild)">Vollfarbe (Vollbild)</option><option value="checker" data-i18n="Schachbrett (Vollbild)">Schachbrett (Vollbild)</option><option value="all" selected data-i18n="Gesamtes Testbild">Gesamtes Testbild</option><option value="colors" data-i18n="Farbflächen">Farbflächen</option><option value="lines" data-i18n="Linienauflösung">Linienauflösung</option><option value="pairs" data-i18n="Farbmischungen">Farbmischungen</option><option value="gradients" data-i18n="Farbverläufe">Farbverläufe</option></select></label><button id="testPattern"><span data-i18n="Testbild erzeugen">Testbild erzeugen</span></button><button id="demo"><span data-i18n="Beispiel laden">Beispiel laden</span></button></div><div id="patternOptions" hidden><div class="row"><label id="patternLabelsControl"><span data-i18n="Testbild-Beschriftung">Testbild-Beschriftung</span><select id="patternLabels"><option value="auto" data-i18n="Automatisch nach Displaygröße">Automatisch nach Displaygröße</option><option value="on" data-i18n="Alle Bezeichnungen">Alle Bezeichnungen</option><option value="off" data-i18n="Nur Auflösung">Nur Auflösung</option></select></label><label id="patternSeedControl" hidden><span data-i18n="Rausch-Startwert">Rausch-Startwert</span><input id="patternSeed" type="number" min="0" max="4294967295" step="1" value="1"><button id="newPatternSeed" data-i18n="Neuer Startwert">Neuer Startwert</button></label><label id="patternFirstColor"><span data-i18n="Testfarbe">Testfarbe</span><select id="patternColorA"></select></label><label id="patternSecondColor"><span data-i18n="Zweite Testfarbe">Zweite Testfarbe</span><select id="patternColorB"></select></label><label id="patternCellControl"><span data-i18n="Schachbrett-Feldgröße (px)">Schachbrett-Feldgröße (px)</span><output id="patternCellValue">1</output><input id="patternCell" type="range" min="1" max="64" step="1" value="1"></label></div><div id="patternMixControls" hidden><div class="row wrap"><label><span data-i18n="Anzahl Mischfarben">Anzahl Mischfarben</span><select id="patternMixSize"></select></label><button id="patternMixPrevious" data-i18n="Vorherige Seite">Vorherige Seite</button><label><span data-i18n="Mischungsseite">Mischungsseite</span><input id="patternMixPage" type="number" min="1" step="1" value="1"></label><button id="patternMixNext" data-i18n="Nächste Seite">Nächste Seite</button></div><p id="patternMixInfo" class="hint"></p><details><summary data-i18n="Mischfeld-Legende">Mischfeld-Legende</summary><p id="patternMixLegend" class="hint"></p></details><p class="hint" data-i18n="Gleiche Anteile je Farbe, maximal zwölf Felder pro Seite. Das allgemeine Testbild enthält weiterhin nur Zweiermischungen.">Gleiche Anteile je Farbe, maximal zwölf Felder pro Seite. Das allgemeine Testbild enthält weiterhin nur Zweiermischungen.</p></div><p id="noiseHint" class="hint" hidden data-i18n="Farbrauschen verwendet die aktuelle Palette. Gleicher Startwert erzeugt dasselbe Muster. Für große, schlecht komprimierbare Testdateien; die Funkdatenmenge hängt von AP und Display ab.">Farbrauschen verwendet die aktuelle Palette. Gleicher Startwert erzeugt dasselbe Muster. Für große, schlecht komprimierbare Testdateien; die Funkdatenmenge hängt von AP und Display ab.</p></div></details><details id="drawingPanel" class="drawingControls"><summary data-i18n="Zeichenebene">Zeichenebene</summary><div class="row wrap"><label class="check"><input id="drawingEnabled" type="checkbox"><span data-i18n="Auf Zielbild zeichnen">Auf Zielbild zeichnen</span></label><label class="check"><input id="drawingVisible" type="checkbox" checked><span data-i18n="Zeichenebene anzeigen">Zeichenebene anzeigen</span></label><button id="drawingBlank" data-i18n="Leere Zeichenfläche">Leere Zeichenfläche</button></div><div class="row wrap"><label><span data-i18n="Zeichenwerkzeug">Zeichenwerkzeug</span><select id="drawingTool"><option value="select" data-i18n="Auswählen / Bearbeiten">Auswählen / Bearbeiten</option><option value="line" selected data-i18n="Linie">Linie</option><option value="rectangle" data-i18n="Rechteck">Rechteck</option><option value="square" data-i18n="Quadrat">Quadrat</option><option value="ellipse" data-i18n="Ellipse">Ellipse</option><option value="circle" data-i18n="Kreis">Kreis</option><option value="text" data-i18n="Text">Text</option><option value="eraser" data-i18n="Radierer">Radierer</option><option value="image" data-i18n="Bild einfügen">Bild einfügen</option></select></label><label><span data-i18n="Zeichenfarbe">Zeichenfarbe</span> <span id="drawingColorSwatch" class="drawingColorSwatch" aria-hidden="true"></span><select id="drawingColor"></select></label><label><span data-i18n="Strich / Radierer (px)">Strich / Radierer (px)</span><output id="drawingWidthValue">1</output><input id="drawingWidth" type="range" min="1" max="64" step="1" value="1"></label><label class="check"><input id="drawingAspect" type="checkbox"><span data-i18n="Seitenverhältnis halten (Shift)">Seitenverhältnis halten (Shift)</span></label><label class="check"><input id="drawingFill" type="checkbox"><span data-i18n="Form ausfüllen">Form ausfüllen</span></label></div><div class="row wrap"><label><span data-i18n="Vorhandenes Element">Vorhandenes Element</span><select id="drawingObjects"></select></label><button id="drawingDelete" disabled data-i18n="Element entfernen">Element entfernen</button></div><div id="drawingTextOptions" hidden><label><span data-i18n="Schriftart">Schriftart</span><select id="drawingFont"><option value="sans" data-i18n="Standard · ohne Serifen">Standard · ohne Serifen</option><option value="serif" data-i18n="Standard · mit Serifen">Standard · mit Serifen</option><option value="mono" data-i18n="Standard · Festbreite">Standard · Festbreite</option><option value="arial">Arial</option><option value="verdana">Verdana</option><option value="trebuchet">Trebuchet MS</option><option value="georgia">Georgia</option><option value="times">Times New Roman</option><option value="courier">Courier New</option></select></label><p class="hint" data-i18n="Verwendet lokal verfügbare Schriften. Fehlt eine Schrift, verwendet der Browser eine passende Ersatzschrift. Texte werden als Bild exportiert; der AP benötigt die Schrift nicht.">Verwendet lokal verfügbare Schriften. Fehlt eine Schrift, verwendet der Browser eine passende Ersatzschrift. Texte werden als Bild exportiert; der AP benötigt die Schrift nicht.</p><label><span data-i18n="Textinhalt">Textinhalt</span><textarea id="drawingText" rows="2" maxlength="1000">Text</textarea></label><div class="row"><label><span data-i18n="Schriftgröße (px)">Schriftgröße (px)</span><output id="drawingSizeValue">16</output><input id="drawingSize" type="range" min="8" max="160" step="1" value="16"></label><label class="check"><input id="drawingBold" type="checkbox" checked><span data-i18n="Fettschrift">Fettschrift</span></label></div></div><div id="drawingImageOptions" hidden><button id="pasteDrawing" type="button" data-i18n="Aus Zwischenablage einfügen">Aus Zwischenablage einfügen</button><label class="upload"><span data-i18n="Bild für Zeichenebene öffnen">Bild für Zeichenebene öffnen</span><input id="drawingFile" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/gif"></label><div class="row"><label><span data-i18n="Eingefügte Bildbreite (px)">Eingefügte Bildbreite (px)</span><input id="drawingImageWidth" type="number" min="1" max="4096" step="1" value="80"></label><label class="check"><input id="drawingSmooth" type="checkbox" checked><span data-i18n="Bild glätten">Bild glätten</span></label></div><p id="drawingImageName" class="hint" data-i18n="Noch kein Einfügebild geladen.">Noch kein Einfügebild geladen.</p></div><p class="hint" data-i18n="Rechteck und Ellipse: von Ecke zu Ecke ziehen. Shift hält das Seitenverhältnis, Alt erzwingt 1:1; gilt auch an den Eckgriffen vorhandener Formen. Kreis weiterhin vom Mittelpunkt aus. Bei Touch ersetzt der Schalter die Shift-Taste.">Rechteck und Ellipse: von Ecke zu Ecke ziehen. Shift hält das Seitenverhältnis, Alt erzwingt 1:1; gilt auch an den Eckgriffen vorhandener Formen. Kreis weiterhin vom Mittelpunkt aus. Bei Touch ersetzt der Schalter die Shift-Taste.</p><div class="row wrap"><button id="drawingUndo" disabled data-i18n="Rückgängig">Rückgängig</button><button id="drawingRedo" disabled data-i18n="Wiederholen">Wiederholen</button><button id="drawingClear" disabled data-i18n="Zeichenebene leeren">Zeichenebene leeren</button><span id="drawingCount" class="hint"></span></div><p class="hint" data-i18n="Auswählen / Bearbeiten: Element anklicken und ziehen; Eckpunkte ändern die Größe. Formen in der Zielvorschau ziehen; Kreis vom Mittelpunkt aus. Text und Bilder per Klick einsetzen. Der Radierer entfernt nur Zeichnungen. Escape verwirft den aktuellen Zug. Bei aktivem Zeichnen ist das Verschieben des Quellbildes gesperrt.">Auswählen / Bearbeiten: Element anklicken und ziehen; Eckpunkte ändern die Größe. Formen in der Zielvorschau ziehen; Kreis vom Mittelpunkt aus. Text und Bilder per Klick einsetzen. Der Radierer entfernt nur Zeichnungen. Escape verwirft den aktuellen Zug. Bei aktivem Zeichnen ist das Verschieben des Quellbildes gesperrt.</p><p class="hint" data-i18n="Die Zeichenebene bleibt bei Bildkorrekturen und Quellenwechsel erhalten. Sie liegt im originalen Displayraster und wird nicht mitskaliert. Export und Versand enthalten die sichtbare Ebene; Farben werden auf die aktuelle Palette abgebildet.">Die Zeichenebene bleibt bei Bildkorrekturen und Quellenwechsel erhalten. Sie liegt im originalen Displayraster und wird nicht mitskaliert. Export und Versand enthalten die sichtbare Ebene; Farben werden auf die aktuelle Palette abgebildet.</p></details><div class="previews"><figure><figcaption><b><span data-i18n="Quellbild">Quellbild</span></b><span id="sourceInfo"><span data-i18n="Kein Bild geladen">Kein Bild geladen</span></span><label class="previewZoom"><span data-i18n="Zoom">Zoom</span><select id="zoom" aria-label="Zoom Quellbild" data-i18n-aria-label="Zoom Quellbild"><option value="fit" data-i18n="Einpassen">Einpassen</option><option value=".25">25 %</option><option value=".5">50 %</option><option value="1">100 %</option><option value="2">200 %</option><option value="4">400 %</option><option value="8">800 %</option></select></label></figcaption><div class="canvaswell" id="sourceWell"><canvas id="source" width="592" height="256" aria-label="Originalbild und Ausschnitt" data-i18n-aria-label="Originalbild und Ausschnitt"></canvas><span id="emptySource" class="empty"><span data-i18n="Bild oder VLW hierher ziehen">Bild oder VLW hierher ziehen</span><br><small><span data-i18n="PNG, JPEG, WebP, BMP, GIF, VLW oder VLW.GZ">PNG, JPEG, WebP, BMP, GIF, VLW oder VLW.GZ</span></small></span></div></figure><figure><figcaption><b><span data-i18n="Display-Vorschau">Display-Vorschau</span></b><span id="targetInfo">296 × 128 px</span><label class="previewZoom"><span data-i18n="Zoom">Zoom</span><select id="targetZoom" aria-label="Zoom Zielbild" data-i18n-aria-label="Zoom Zielbild"><option value="fit" data-i18n="Einpassen">Einpassen</option><option value=".25">25 %</option><option value=".5">50 %</option><option value="1">100 %</option><option value="2">200 %</option><option value="4">400 %</option><option value="8">800 %</option></select></label></figcaption><div class="canvaswell"><canvas id="target" width="296" height="128" aria-label="Quantisiertes Zielbild" data-i18n-aria-label="Quantisiertes Zielbild"></canvas><span id="emptyTarget" class="empty"><span data-i18n="Keine Ausgabe vorhanden">Keine Ausgabe vorhanden</span></span></div><div class="targetViewControls"><label><span data-i18n="Entfernungsvorschau (Blur)">Entfernungsvorschau (Blur)</span><output id="targetBlurValue">0 px</output><input id="targetBlur" type="range" min="0" max="4" step="0.25" value="0"></label><p class="hint" data-i18n="Nur Anzeige, ohne Einfluss auf Export und Versand.">Nur Anzeige, ohne Einfluss auf Export und Versand.</p></div></figure></div><div class="previewfoot"><span id="imageName"><span data-i18n="Noch keine Datei">Noch keine Datei</span></span><span id="paletteInfo"><span data-i18n="Vorschau mit ausgewählter Farbpalette">Vorschau mit ausgewählter Farbpalette</span></span></div></section>
+</div></div>
+<div class="delivery"><section><h2><span>04</span> Export</h2><label><span data-i18n="Dateiorientierung beim Speichern">Dateiorientierung beim Speichern</span><select id="exportOrientation"><option value="native" data-i18n="Originales Displayformat">Originales Displayformat</option><option value="view" data-i18n="Aktuelle Darstellung / Aufstellung">Aktuelle Darstellung / Aufstellung</option></select></label><label class="check"><input id="exportContentOnly" type="checkbox"> <span data-i18n="Nur Bildfläche speichern (ohne Einpassränder)">Nur Bildfläche speichern (ohne Einpassränder)</span></label><p class="hint"><span data-i18n="Entfernt nur beim Einpassen ergänzte Displayränder. Ränder im Quellbild bleiben erhalten. Gilt für PNG, JPEG, VLW und AP-Dateiablage; Direktversand und VLW-Test behalten das vollständige Displayformat.">Entfernt nur beim Einpassen ergänzte Displayränder. Ränder im Quellbild bleiben erhalten. Gilt für PNG, JPEG, VLW und AP-Dateiablage; Direktversand und VLW-Test behalten das vollständige Displayformat.</span></p><p class="hint" id="orientationInfo"><span data-i18n="Direktversand und VLW-Test verwenden immer das originale Displayformat.">Direktversand und VLW-Test verwenden immer das originale Displayformat.</span></p><div class="exports"><button id="png" disabled class="primary">PNG <small><span data-i18n="Verlustfrei">Verlustfrei</span></small></button><button id="jpeg" disabled>OEPL-JPEG <small><span data-i18n="Baseline · 4:4:4 · Qualität 100">Baseline · 4:4:4 · Qualität 100</span></small></button><div class="vlwExport"><button id="vlw" disabled><span data-i18n="VLW-Font">VLW-Font</span> <small><span data-i18n="Alle Farben + Alphamaske">Alle Farben + Alphamaske</span></small></button><p id="vlwWarning" class="vlwInlineWarning" role="status" hidden><span aria-hidden="true">⚠</span><span data-i18n="Zeichen über 255 Pixel können vom VLW-Renderer fehlerhaft dargestellt werden.">Zeichen über 255 Pixel können vom VLW-Renderer fehlerhaft dargestellt werden.</span></p><label class="check gzipChoice"><input id="gzipFont" type="checkbox" checked> <span data-i18n="VLW mit Gzip packen (.vlw.gz)">VLW mit Gzip packen (.vlw.gz)</span></label></div></div><p class="hint"><span data-i18n="JPEG: verlustbehaftet, Qualität 100 ohne Farbunterabtastung. PNG: verlustfrei, mit Transparenz.">JPEG: verlustbehaftet, Qualität 100 ohne Farbunterabtastung. PNG: verlustfrei, mit Transparenz.</span></p><details><summary><span data-i18n="VLW-Einstellungen &amp; Verwendung">VLW-Einstellungen &amp; Verwendung</span></summary><label class="check"><input id="xpatch" type="checkbox"> <span data-i18n="x-Position-0-Patch anwenden">x-Position-0-Patch anwenden</span></label><label class="check"><input id="alphaPlane" type="checkbox" checked> <span data-i18n="Separate Deckungsmaske ergänzen">Separate Deckungsmaske ergänzen</span></label><p id="vlwInfo" class="hint"><span data-i18n="Ein Glyph pro Palettenfarbe, ergänzt um die optionale Deckungsmaske.">Ein Glyph pro Palettenfarbe, ergänzt um die optionale Deckungsmaske.</span></p><button id="manifest"><span data-i18n="Ebenenplan als JSON">Ebenenplan als JSON</span></button><pre id="vlwExample"><span data-i18n="Bitte zuerst ein Bild laden.">Bitte zuerst ein Bild laden.</span></pre></details></section>
+<section><h2><span>05</span> <span data-i18n="OpenEPaperLink verbinden">OpenEPaperLink verbinden</span></h2><p class="hint"><span data-i18n="Display auswählen, Profil übernehmen und Bilder vom AP laden oder an ihn senden.">Display auswählen, Profil übernehmen und Bilder vom AP laden oder an ihn senden.</span></p><div class="row wrap"><label class="grow"><span data-i18n="AP-Adresse">AP-Adresse</span><input id="apAddress" list="knownAPs" placeholder="http://192.168.1.50" autocomplete="url"></label><datalist id="knownAPs"></datalist><button id="connect"><span data-i18n="Verbinden">Verbinden</span></button><button id="discover"><span data-i18n="Bekannte APs suchen">Bekannte APs suchen</span></button></div><p class="hint"><span data-i18n="Geprüft werden gespeicherte Adressen und openepaperlink.local. Browser erlauben keinen allgemeinen Netzwerk-Scan. Bei blockiertem Zugriff die App vom selben AP bereitstellen; Details in der README.">Geprüft werden gespeicherte Adressen und openepaperlink.local. Browser erlauben keinen allgemeinen Netzwerk-Scan. Bei blockiertem Zugriff die App vom selben AP bereitstellen; Details in der README.</span></p><div class="row"><label class="grow"><span data-i18n="Displays auf diesem AP">Displays auf diesem AP</span><select id="tags"><option value="" data-i18n="Zuerst verbinden">Zuerst verbinden</option></select></label><button id="profile" disabled><span data-i18n="Profil übernehmen">Profil übernehmen</span></button></div><label><span data-i18n="Display-MAC (auch manuell)">Display-MAC (auch manuell)</span><input id="mac" placeholder="0011223344556677" maxlength="23"></label><p id="tagInfo" class="hint"><span data-i18n="Noch kein Display ausgewählt.">Noch kein Display ausgewählt.</span></p><div class="row wrap"><button id="read" disabled><span data-i18n="AP-Bild als Quelle laden">AP-Bild als Quelle laden</span></button><button id="raw" disabled><span data-i18n="RAW herunterladen">RAW herunterladen</span></button><button id="send" disabled class="primary"><span data-i18n="An Display senden">An Display senden</span></button></div><p class="hint"><span data-i18n="Senden ersetzt den Displayinhalt beim nächsten Abruf. Das AP-Bild kann vom tatsächlichen Displaystand abweichen. Bei HTTP 413 wird dasselbe JPEG über die AP-Dateiverwaltung übertragen; dafür wird freier Dateispeicher benötigt. Kein Upload erfolgt automatisch.">Senden ersetzt den Displayinhalt beim nächsten Abruf. Das AP-Bild kann vom tatsächlichen Displaystand abweichen. Bei HTTP 413 wird dasselbe JPEG über die AP-Dateiverwaltung übertragen; dafür wird freier Dateispeicher benötigt. Kein Upload erfolgt automatisch.</span></p></section>
 
-Version Date       Changes
-1.0     2024-04-21
-1.1     2024-04-21 Swapped yellow/red distance calculation
-1.2     2024-05-04 Added internal bitmap cropping to save space
-1.3     2024-10-06 Added patch-mode for whitespace elimination at x-position = 0
-1.4     2024-12-02 Add maximum dimension warning
--->
-<head>
-  <meta charset='UTF-8'>
-  <title>Image to VLW converter</title>
-  <style>
-    body {
-  font-family: sans-serif;
-}
+<section><h2><span>06</span> <span data-i18n="Dateien auf dem AP">Dateien auf dem AP</span></h2>
+<p class="hint"><span data-i18n="JPEG oder VLW im AP-Dateisystem speichern. Es gilt die gewählte Exportorientierung. Der VLW-Test verwendet das originale Displayformat.">JPEG oder VLW im AP-Dateisystem speichern. Es gilt die gewählte Exportorientierung. Der VLW-Test verwendet das originale Displayformat.</span></p>
+<label><span data-i18n="JPEG-Dateipfad">JPEG-Dateipfad</span><input id="jpegPath" value="/images/studio-image.jpg"></label>
+<label><span data-i18n="VLW-Dateipfad">VLW-Dateipfad</span><input id="fontPath" value="/fonts/studio-image.vlw.gz"></label>
+<label class="check"><input id="overwriteFiles" type="checkbox"> <span data-i18n="Bestehende Dateien mit gleichem Namen überschreiben">Bestehende Dateien mit gleichem Namen überschreiben</span></label>
+<div class="row wrap"><button id="storeJPEG" disabled><span data-i18n="JPEG auf AP speichern">JPEG auf AP speichern</span></button><button id="storeVLW" disabled><span data-i18n="VLW + Ebenenplan auf AP speichern">VLW + Ebenenplan auf AP speichern</span></button></div>
+<details open><summary><span data-i18n="Vom AP importieren">Vom AP importieren</span></summary>
+<div class="row wrap"><label><span data-i18n="Verzeichnis">Verzeichnis</span><input id="apDirectory" value="/images"></label><button id="listFiles"><span data-i18n="Dateien laden">Dateien laden</span></button><button id="parentDirectory"><span data-i18n="Übergeordnet">Übergeordnet</span></button></div>
+<label><span data-i18n="Datei oder Ordner">Datei oder Ordner</span><select id="apFiles"><option value="" data-i18n="Noch keine Dateiliste">Noch keine Dateiliste</option></select></label>
+<div class="row wrap"><button id="openAPFile"><span data-i18n="Öffnen / importieren">Öffnen / importieren</span></button><button id="downloadAPFile"><span data-i18n="Datei herunterladen">Datei herunterladen</span></button></div>
+<p class="hint"><span data-i18n="Bildformate und kompatible VLW-Bildfonts werden als Quelle geladen. Für VLW wird der gespeicherte Ebenenplan verwendet, sonst die aktuelle Palette. RAW-Vorschauen bitte über die Displayauswahl laden.">Bildformate und kompatible VLW-Bildfonts werden als Quelle geladen. Für VLW wird der gespeicherte Ebenenplan verwendet, sonst die aktuelle Palette. RAW-Vorschauen bitte über die Displayauswahl laden.</span></p></details>
+</section>
+<section><h2><span>07</span> <span data-i18n="VLW-Template &amp; Test">VLW-Template &amp; Test</span></h2>
+<p class="hint"><span data-i18n="Alle Farbebenen werden am selben Ort gezeichnet. Die Alphamaske wird ausgelassen. Positionen beziehen sich auf das originale Displayformat.">Alle Farbebenen werden am selben Ort gezeichnet. Die Alphamaske wird ausgelassen. Positionen beziehen sich auf das originale Displayformat.</span></p>
+<div class="row"><label>Position X<input id="templateX" type="number" min="-32767" max="32767" value="1"></label><label>Position Y<input id="templateY" type="number" min="-32767" max="32767" value="0"></label></div>
 
-form div {
-  padding-bottom: 8px;
-}
-
-.infomsg {
-  padding: 8px; 
-  margin: 16px 0px 16px 0px; 
-  border: 2px solid #b6effb; 
-  background-color: #cff4fc; 
-  border-radius: 8px; 
-  color: #055160;
-}
-
-.warningmsg {
-  padding: 8px; 
-  margin: 16px 0px 16px 0px; 
-  border: 2px solid #ffecb5; 
-  background-color: #fff3cd; 
-  border-radius: 8px; 
-  color: #664d03;
-}
-  </style>
-</head>
-
-<body>
-  <h1>Image to VLW converter for e-ink displays</h1>
-<p>
-<form>
-  <div>
-  <label for="file">Upload image:</label>
-  <input type="file" accept=".jpg,.jpeg,.png,.gif,.bmp" onchange="upload(this);">
-  </div>
-  <div>
-  <label for="color">Third e-ink color:</label>
-  <select id="color" name="color" value="0" onchange="redraw();">
-    <option value="0">none</option>
-    <option value="1">red</option>
-    <option value="2">yellow</option>
-  </select>
-  </div>
-  <div>
-  <label for="maxw">Width (px):</label>
-  <input id="maxw" type="number" value=0 min=0 size=4 onchange="redraw();">
-  <label for="maxh">Height (px):</label>
-  <input id="maxh" type="number" value=0 min=0 size=4 onchange="redraw();">
-  </div>
-  <div>
-  <label for="lumoff">Luminance offset:</label>
-  <input id="lumoff" type="number" value=0 min=-127 max=127 size=4 onchange="redraw();">
-  </div>
-  <div>
-  <label for="xpatch" title="Apply this patch if you want the image to be displayed at x-position 0. This will prevent the font renderer from breaking the display due to whitespace elimination. Be sure to print the images in the order as noted by the converter, otherwise the patch pixel will be visible. This patch may result in larger file sizes.">Apply x-pos 0 patch</label>
-  <input id="xpatch" type="checkbox" onchange="redraw();">
-  </div>
-  <div>
-  <input id="download" type="button" value="Download as VLW font" onclick="downloadVlw();" disabled>
-  </div>
-</form>
-</p>
-<p>Image size: <span id="iw">0</span>×<span id="ih">0</span> px (original size <span id="ow">0</span>×<span id="oh">0</span> px)<br/><br/>
-<i>Note: Black color bitmap will be mapped to font-character "0", third color bitmap to character "1".</i></p>
-<hr />
-<p id="xpatchcontainer" class="infomsg" style="display:none;">x-pos 0 patch: <span id="xpatchmsg"></span></p>
-<p id="msgcontainer" style="display:none;"><span id="msgtxt"></span></p>
-<p>
-<canvas id=c></canvas>
-</p>
-
-<script>
-const c = document.getElementById("c"),
-	ctx = c.getContext("2d"),
-	image = new Image();
-
-var vlwdata = "",
-	vlwfilename = "image.vlw";
-
-function conv(size) {
-    return String.fromCharCode(
-        (size >> 24) & 0xff,
-        (size >> 16) & 0xff,
-        (size >> 8) & 0xff,
-        size & 0xff);
-}
-
-function getDistcol(r1, g1, b1, r2, g2, b2) {
-    return Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2);
-}
-
-function shiftLum(val, offset) {
-    return (Math.min(Math.max(val + offset, 0), 255));
-}
-
-function autocropVlw(vlwbmp, vlwwidth, vlwheight) {
-    // Autocrop bitmap
-    let i,
-		posx = 0,
-		posy = 0,
-		ptop = -1,
-		pheight = 0;
-		pleft = vlwwidth - 1;
-		pwidth = 0,
-		vlwcrop = "",
-		imax = vlwwidth * vlwheight;
-
-    // Find boundaries
-    for (i = 0; i < imax; ++i, ++posx) {
-        if (posx >= vlwwidth) {
-            posx = 0;
-            ++posy;
-        }
-        if (vlwbmp.charCodeAt(i)) { // Non-white pixel
-            if (ptop == -1) // Set top
-                ptop = posy;
-            pheight = posy + 1; // Set height
-            if (pleft > posx) // Set left
-                pleft = posx;
-            if (pwidth <= posx) // Set width
-                pwidth = posx + 1;
-        }
-    }
-    if (ptop == -1) {
-        // Bitmap is completely empty - return empty bitmap
-        ptop = 0;
-        pleft = 0;
-    } else {
-        // Now we have the boundaries - let's crop the vlw data!
-        for (i = 0, posx = 0, posy = 0; i < (vlwwidth * vlwheight); ++i, ++posx) {
-            if (posx >= vlwwidth) {
-                posx = 0;
-                ++posy;
-            }
-            if (posx >= pleft && posx < pwidth && posy >= ptop && posy < pheight) {
-                vlwcrop += vlwbmp[i]; // Copy data within boundaries
-            }
-        }
-    }
-    return {
-        posleft: pleft,
-        postop: ptop,
-        width: pwidth - pleft,
-        height: pheight - ptop,
-        vlw: vlwcrop,
-    }
-}
-
-function processImg() {
-    let idata = ctx.getImageData(0, 0, c.width, c.height),
-		buffer = idata.data,
-		len = buffer.length,
-		threshold = 127,
-		i,
-		thirdcol = parseInt(document.getElementById("color").value),
-		lumoff = parseInt(document.getElementById("lumoff").value),
-		xpatch = document.getElementById("xpatch").checked,
-		distb,
-		distw,
-		distt = 1024, //Off-scale distant by default
-		vlwbitmap = "",
-		vlwthird = "",
-		x = 0,
-		y = 0,
-		xpx = 32767,
-		xpy = 0,
-		xpm = 0,
-		xpml = 0;
-
-    if (thirdcol == 0) // Disable x-pos 0 patch on monochrome images
-        xpatch = false;
-
-    // Convert to vlw bitmap first
-    for (i = 0; i < len; i += 4, ++x) {
-        if (x >= c.width) {
-            x = 0;
-            ++y;
-        }
-        xpml = 0;
-        buffer[i] = shiftLum(buffer[i], lumoff);
-        buffer[i + 1] = shiftLum(buffer[i + 1], lumoff);
-        buffer[i + 2] = shiftLum(buffer[i + 2], lumoff);
-        distw = getDistcol(
-                buffer[i],
-                buffer[i + 1],
-                buffer[i + 2],
-                0xff,
-                0xff,
-                0xff);
-        distb = getDistcol(
-                buffer[i],
-                buffer[i + 1],
-                buffer[i + 2],
-                0x00,
-                0x00,
-                0x00);
-        if (thirdcol) {
-            // Three colors - calculate third color distance
-            distt = getDistcol(
-                    buffer[i],
-                    buffer[i + 1],
-                    buffer[i + 2],
-                    0xff,
-                    thirdcol == 2 ? 0xff : 0x00,
-                    0x00);
-        }
-
-        if (distw < distb && distw < distt) {
-            // White is matching best
-            buffer[i] = 0xff;
-            buffer[i + 1] = 0xff;
-            buffer[i + 2] = 0xff;
-            vlwbitmap += String.fromCharCode(0x00);
-            if (thirdcol)
-                vlwthird += String.fromCharCode(0x00);
-        } else {
-            if (distb <= distw && distb < distt) {
-                // Black is matching best
-                buffer[i] = 0x00;
-                buffer[i + 1] = 0x00;
-                buffer[i + 2] = 0x00;
-                vlwbitmap += String.fromCharCode(0xff);
-                if (thirdcol)
-                    vlwthird += String.fromCharCode(0x00);
-                xpml |= 0x01;
-            } else {
-                // Third color matches best
-                buffer[i] = 0xff;
-                buffer[i + 1] = thirdcol == 1 ? 0x00 : 0xff;
-                buffer[i + 2] = 0x00;
-                vlwbitmap += String.fromCharCode(0x00);
-                vlwthird += String.fromCharCode(0xff);
-                xpml |= 0x02;
-            }
-        }
-        if ((xpml == 0x01 || xpml == 0x02) && xpx >= x) {
-            if (xpx > x) { // New boundary for patch
-                xpx = x;
-                xpy = y;
-                xpm = xpml;
-            } else {
-                xpm |= xpml;
-            }
-        }
-    }
-
-    if (xpatch) { // x-pos 0 patch active?
-        if (xpm == 0x01 || xpm == 0x02) {
-            // Patch given pixel
-            let xpatchpos = xpy * c.width + xpx;
-            if (xpm == 0x01) // Black pixel at left boundary?
-                vlwthird = vlwthird.substring(0, xpatchpos) + String.fromCharCode(0xff) + vlwthird.substring(xpatchpos + 1); // Set same pixel on third color
-            else // Third color in front?
-                vlwbitmap = vlwbitmap.substring(0, xpatchpos) + String.fromCharCode(0xff) + vlwbitmap.substring(xpatchpos + 1); // Set same pixel on black color
-
-            // Add green dot to preview image
-            buffer[(xpy * c.width + xpx) * 4] = 0x00;
-            buffer[((xpy * c.width + xpx) * 4) + 1] = 0xff;
-            buffer[((xpy * c.width + xpx) * 4) + 2] = 0x00;
-
-            document.getElementById('xpatchmsg').innerHTML = "<b>" + (xpm == 0x01 ? (thirdcol == 1 ? "red" : "yellow" ) : "black") + " color</b> image patched. Print this image <b>first</b>!";
-        } else
-            document.getElementById('xpatchmsg').innerHTML = "No patch required.";
-
-        document.getElementById('xpatchcontainer').style.display = ""; // Enable message
-    } else
-        document.getElementById('xpatchcontainer').style.display = "none"; // Disable message
-
-    // Crop internal bitmap data
-    const blackcrop = autocropVlw(vlwbitmap, c.width, c.height),
-          thirdcrop = autocropVlw(vlwthird, c.width, c.height);
-
-    // Bitmap too large warning
-    if(blackcrop.width > 255 || blackcrop.height > 255 || thirdcrop.width > 255 || thirdcrop.height > 255) {
-	  document.getElementById('msgtxt').innerHTML = "<b>WARNING:</b> At least one bitmap dimension exceeds 255 pixels! Due to an internal limitation of the OpenEPaperLink VLW-renderer, the image may not be displayed correctly!<br/>Actual bitmap dimensions: black " + blackcrop.width + "×" + blackcrop.height + " px" + (thirdcol ? (thirdcol == 1 ? ", red " : ", yellow " ) + thirdcrop.width + "×" + thirdcrop.height + " px" : "");
-	  
-	   document.getElementById('msgcontainer').style.display = "";
-	   document.getElementById('msgcontainer').className = "warningmsg";
-	} else
-	   document.getElementById('msgcontainer').style.display = "none";
-
-    // Create vlw data
-    // vlw header
-    vlwdata = conv(thirdcol == 0 ? 1 : 2); // Glyph Count
-    vlwdata += conv(11); // Version (11)
-    vlwdata += conv(c.height); // Font size
-    vlwdata += conv(0); // ignored
-    vlwdata += conv(c.height); // Font ascend (from letter d)
-    vlwdata += conv(0); // Font descend (from letter p)
-    // Character header 1
-    vlwdata += conv(48); // Character: 0
-    vlwdata += conv(blackcrop.height); // Height
-    vlwdata += conv(blackcrop.width); // Width
-    vlwdata += conv(c.width); // Setwidth
-    vlwdata += conv(c.height - blackcrop.postop); // Topextend
-    vlwdata += conv(blackcrop.posleft); // Leftextend
-    vlwdata += conv(0); // Padding
-    if (thirdcol) {
-        // Character header 2
-        vlwdata += conv(49); // Character: 1
-        vlwdata += conv(thirdcrop.height); // Height
-        vlwdata += conv(thirdcrop.width); // Width
-        vlwdata += conv(c.width); // Setwidth
-        vlwdata += conv(c.height - thirdcrop.postop); // Topextend
-        vlwdata += conv(thirdcrop.posleft); // Leftextend
-        vlwdata += conv(0); // Padding
-    }
-
-    vlwdata += blackcrop.vlw;
-
-    if (thirdcol) {
-        vlwdata += thirdcrop.vlw; //Add additional bitmap for third color
-    }
-
-    vlwdata += String.fromCharCode(11);
-    vlwdata += "Image";
-    vlwdata += String.fromCharCode(0);
-    vlwdata += String.fromCharCode(11);
-    vlwdata += "Image";
-    vlwdata += String.fromCharCode(0);
-    // update canvas with the resulting bitmap data
-    ctx.putImageData(idata, 0, 0);
-}
-
-function upload(input) {
-    if (input.files && input.files[0]) {
-        vlwfilename = input.files[0].name + ".vlw";
-        const reader = new FileReader();
-        reader.readAsDataURL(input.files[0]);
-        reader.onload = () => {
-            image.src = reader.result;
-            image.onload = () => {
-                redraw();
-            };
-        };
-    }
-}
-
-function redraw() {
-    if (image.width) {
-        document.getElementById('download').disabled = false; // Enable download button
-
-        let maxw = parseInt(document.getElementById("maxw").value),
-			maxh = parseInt(document.getElementById("maxh").value),
-			thirdcol = parseInt(document.getElementById("color").value),
-			cwidth = image.width,
-			cheight = image.height,
-			resizefactor = 1;
-        if (thirdcol == 0) {
-            document.getElementById("xpatch").checked = false;
-            document.getElementById('xpatch').disabled = true;
-        } else
-            document.getElementById('xpatch').disabled = false;
-        if (maxw > 0) {
-            cwidth = maxw;
-            if (!maxh) {
-                resizefactor = maxw / image.width;
-                cheight = image.height * resizefactor;
-            }
-        }
-        if (maxh > 0) {
-            cheight = maxh;
-            if (!maxw) {
-                resizefactor = maxh / image.height;
-                cwidth = image.width * resizefactor;
-            }
-        }
-        cwidth = Math.floor(cwidth);
-        cheight = Math.floor(cheight);
-        document.getElementById("iw").innerHTML = cwidth;
-        document.getElementById("ih").innerHTML = cheight;
-        document.getElementById("ow").innerHTML = image.width;
-        document.getElementById("oh").innerHTML = image.height;
-        c.width = cwidth == 0 ? 1 : cwidth; // Avoid zero width
-        c.height = cheight == 0 ? 1 : cheight; // Avoid zero height
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, c.width, c.height); // Fill background
-        ctx.drawImage(image, 0, 0, c.width, c.height);
-        processImg();
-    } else {
-        console.log("No image loaded yet!");
-    }
-}
-
-function downloadVlw() {
-    const bl = vlwdata.length,
-		abuffer = new ArrayBuffer(bl);
-    let chars = new Uint8Array(abuffer);
-    
-	for(let i = 0; i < bl; i++)
-        chars[i] = vlwdata.charCodeAt(i);
-
-	const file = new File([abuffer], vlwfilename, {
-        type: "application/x-msdownload"
-    }),
-		url = URL.createObjectURL(file),
-		a = document.createElement("a");
-		
-	a.href = url;
-	a.download = file.name;
-	a.click();
-	URL.revokeObjectURL(url);
-}
-
-</script>
-</body>
-</html>
+<p id="templateInfo" class="hint"><span data-i18n="Bitte zuerst ein Bild laden.">Bitte zuerst ein Bild laden.</span></p>
+<label><span data-i18n="OEPL-JSON-Template">OEPL-JSON-Template</span><textarea id="templateJSON" rows="8" readonly spellcheck="false"></textarea></label>
+<div class="canvaswell templatewell"><canvas id="templatePreview" width="296" height="128" aria-label="VLW-Template mit Position auf dem Display" data-i18n-aria-label="VLW-Template mit Position auf dem Display"></canvas></div>
+<div class="row wrap"><button id="saveTemplate" disabled><span data-i18n="Template herunterladen">Template herunterladen</span></button><button id="testVLW" disabled class="primary"><span data-i18n="VLW hochladen &amp; Template senden">VLW hochladen &amp; Template senden</span></button></div><p id="nativeVlwWarning" class="vlwInlineWarning" role="status" hidden><span aria-hidden="true">⚠</span><span data-i18n="Zeichen über 255 Pixel können vom VLW-Renderer fehlerhaft dargestellt werden.">Zeichen über 255 Pixel können vom VLW-Renderer fehlerhaft dargestellt werden.</span></p>
+<p class="hint"><span data-i18n="Der Test speichert Font und Ebenenplan unter den angegebenen Namen, prüft die gespeicherten Daten und sendet erst danach das Template an das ausgewählte Display. Sein bisheriger Inhalt und Inhaltsmodus werden dabei ersetzt.">Der Test speichert Font und Ebenenplan unter den angegebenen Namen, prüft die gespeicherten Daten und sendet erst danach das Template an das ausgewählte Display. Sein bisheriger Inhalt und Inhaltsmodus werden dabei ersetzt.</span></p>
+</section>
+</div>
+<div id="ledDesigner" hidden>
+<div class="intro"><div><p class="eyebrow"><span data-i18n="LED-STEUERUNG">LED-STEUERUNG</span></p><h1><span data-i18n="LED-Blinksequenzen">LED-Blinksequenzen</span></h1><p><span data-i18n="Farben, Impulse und Wiederholungen konfigurieren, simulieren und am Display testen.">Farben, Impulse und Wiederholungen konfigurieren, simulieren und am Display testen.</span></p></div><span class="badge"><span data-i18n="3 Gruppen · 12-Byte-Datenpaket">3 Gruppen · 12-Byte-Datenpaket</span></span></div>
+<div id="ledStatus" role="status" aria-live="polite"><span data-i18n="Simulation mit „Abspielen“ starten.">Simulation mit „Abspielen“ starten.</span></div>
+<div class="ledLayout"><div>
+<section><h2><span>01</span> <span data-i18n="Hardware &amp; Ablauf">Hardware &amp; Ablauf</span></h2>
+<label><span data-i18n="Firmwareprofil">Firmwareprofil</span><select id="ledProfile"></select></label><p id="ledProfileInfo" class="hint"></p>
+<label><span data-i18n="Kanalreihenfolge">Kanalreihenfolge</span><select id="ledOrder"></select></label><p id="ledOrderInfo" class="hint"></p>
+<div class="row"><label><span data-i18n="Pulsstufe">Pulsstufe</span><select id="ledPulse"></select></label><label><span data-i18n="Gesamtdurchläufe">Gesamtdurchläufe</span><input id="ledRepeats" type="number" min="1" max="254" value="2"></label></div>
+<label class="check"><input id="ledForever" type="checkbox"> <span data-i18n="Endlos wiederholen">Endlos wiederholen</span></label>
+<p class="hint"><span data-i18n="Drei Gruppen werden nacheinander ausgeführt. Nach jedem Impuls folgt eine Pause mit ausgeschalteter LED, auch nach dem letzten Impuls einer Gruppe.">Drei Gruppen werden nacheinander ausgeführt. Nach jedem Impuls folgt eine Pause mit ausgeschalteter LED, auch nach dem letzten Impuls einer Gruppe.</span></p>
+</section>
+<section><h2><span>02</span> <span data-i18n="Sequenzgruppen">Sequenzgruppen</span></h2><p class="hint"><span data-i18n="Farben werden auf die verfügbaren Stufen des Firmwareprofils und der Kanalreihenfolge gerundet. Schwarz bedeutet bei einer RGB-LED „aus“.">Farben werden auf die verfügbaren Stufen des Firmwareprofils und der Kanalreihenfolge gerundet. Schwarz bedeutet bei einer RGB-LED „aus“.</span></p><div id="ledGroups"></div></section>
+<section><h2><span>03</span> <span data-i18n="Vorlagen">Vorlagen</span></h2><label><span data-i18n="Vorlage">Vorlage</span><select id="ledPreset"><option value="signal" data-i18n="Dreifarbiges Signal">Dreifarbiges Signal</option><option value="gentle" data-i18n="Kurzes grünes Signal">Kurzes grünes Signal</option><option value="chase" data-i18n="Farbwechsel">Farbwechsel</option></select></label><button id="ledLoadPreset"><span data-i18n="Vorlage laden">Vorlage laden</span></button>
+<label><span data-i18n="Eigener Presetname">Eigener Presetname</span><input id="ledPresetName" maxlength="60" placeholder="Name der LED-Vorlage" data-i18n-placeholder="Name der LED-Vorlage"></label><div class="row wrap"><button id="ledSavePreset"><span data-i18n="Im Browser speichern">Im Browser speichern</span></button><button id="ledDeletePreset"><span data-i18n="Eigenes Preset löschen">Eigenes Preset löschen</span></button></div>
+<details><summary><span data-i18n="Design als JSON importieren">Design als JSON importieren</span></summary><label><span data-i18n="JSON-Datei">JSON-Datei</span><input id="ledImportFile" type="file" accept="application/json,.json"></label><label><span data-i18n="Oder JSON / 24 Hex-Zeichen einfügen">Oder JSON / 24 Hex-Zeichen einfügen</span><textarea id="ledImportText" rows="5" spellcheck="false"></textarea></label><button id="ledImport"><span data-i18n="Importieren">Importieren</span></button></details>
+</section>
+</div><div class="ledStage">
+<section><div class="paneltop"><h2><span data-i18n="Zeitstrahl &amp; Simulation">Zeitstrahl &amp; Simulation</span></h2><span id="ledDuration" class="badge"></span></div>
+<div id="ledTimeline" class="ledTimeline"></div><p class="hint"><span data-i18n="Zeitstrahl zeigt einen Gesamtdurchlauf. Anklicken setzt den Abspielkopf. Sehr kurze Impulse sind zur Erkennbarkeit mindestens eine Bildschirmlinie breit; exakte Zeiten stehen in der Auswertung.">Zeitstrahl zeigt einen Gesamtdurchlauf. Anklicken setzt den Abspielkopf. Sehr kurze Impulse sind zur Erkennbarkeit mindestens eine Bildschirmlinie breit; exakte Zeiten stehen in der Auswertung.</span></p>
+<div class="ledSimulator"><div class="ledDevice"><div class="ledPaper">OpenEPaperLink<br><strong><span data-i18n="LED-Simulation">LED-Simulation</span></strong></div><div id="ledBulb" class="ledBulb" aria-label="Simulierte LED" data-i18n-aria-label="Simulierte LED"></div></div><div class="ledReadout"><strong id="ledColorLabel"><span data-i18n="LED aus">LED aus</span></strong><p id="ledClock">0 ms</p><div class="row wrap"><button id="ledPlay" class="primary"><span data-i18n="Abspielen">Abspielen</span></button><button id="ledPause"><span data-i18n="Pause">Pause</span></button><button id="ledReset"><span data-i18n="Zurück">Zurück</span></button></div></div></div>
+<label><span data-i18n="Position in der Simulation">Position in der Simulation</span><input id="ledSeek" type="range" min="0" max="1" step="0.1" value="0"></label>
+<div class="row"><label><span data-i18n="Simulationsansicht">Simulationsansicht</span><select id="ledSimulationMode"><option value="visible" data-i18n="Wahrnehmung · Impulse min. 60 ms">Wahrnehmung · Impulse min. 60 ms</option><option value="exact" data-i18n="Zeitgetreu · gemittelte PWM-Farbe">Zeitgetreu · gemittelte PWM-Farbe</option><option value="pwm" data-i18n="PWM-Details · einzelne Schaltzeiten">PWM-Details · einzelne Schaltzeiten</option></select></label><label><span data-i18n="Geschwindigkeit">Geschwindigkeit</span><select id="ledSpeed"><option value="1" data-i18n="1× · Echtzeit">1× · Echtzeit</option><option value="0.1" data-i18n="0,1× · 10-fach langsamer">0,1× · 10-fach langsamer</option><option value="0.01" data-i18n="0,01× · 100-fach langsamer">0,01× · 100-fach langsamer</option><option value="0.001" data-i18n="0,001× · 1000-fach langsamer">0,001× · 1000-fach langsamer</option></select></label></div>
+<p id="ledSimulationNote" class="hint"><span data-i18n="Wahrnehmungsansicht verlängert nur die sichtbare Darstellung. Zeit- und Energieberechnungen verwenden stets die tatsächlichen Pulse. Ein Bildschirm kann Submillisekunden-Pulse nicht zeitgetreu darstellen.">Wahrnehmungsansicht verlängert nur die sichtbare Darstellung. Zeit- und Energieberechnungen verwenden stets die tatsächlichen Pulse. Ein Bildschirm kann Submillisekunden-Pulse nicht zeitgetreu darstellen.</span></p>
+</section>
+<section><h2><span data-i18n="Leuchtdauer &amp; Energie">Leuchtdauer &amp; Energie</span></h2><div id="ledMetrics" class="ledMetrics"></div>
+<div class="ledTableWrap"><table class="ledTable"><thead><tr><th><span data-i18n="Farbe">Farbe</span></th><th><span data-i18n="Impulse">Impulse</span></th><th><span data-i18n="Pulsfenster">Pulsfenster</span></th><th><span data-i18n="LED an (ohne PWM-Pausen)">LED an (ohne PWM-Pausen)</span></th><th><span data-i18n="LED-Ladung">LED-Ladung</span></th></tr></thead><tbody id="ledColorStats"></tbody></table></div>
+<div id="ledChannelStats" class="ledChannelStats"></div>
+<details><summary><span data-i18n="Strommodell kalibrieren">Strommodell kalibrieren</span></summary><p class="hint"><span data-i18n="Beispielwerte, keine Messdaten. Angegeben wird der Strom des vollständig eingeschalteten physischen Farbkanals. Funk, Displayrefresh, Schlafstrom und Treiberverluste sind nicht enthalten. Zusatzstrom wird nur während der Pulsfenster angesetzt.">Beispielwerte, keine Messdaten. Angegeben wird der Strom des vollständig eingeschalteten physischen Farbkanals. Funk, Displayrefresh, Schlafstrom und Treiberverluste sind nicht enthalten. Zusatzstrom wird nur während der Pulsfenster angesetzt.</span></p>
+<div class="row"><label><span data-i18n="Rot (mA)">Rot (mA)</span><input id="ledCurrentR" type="number" min="0" max="100" step="0.1" value="2"></label><label><span data-i18n="Grün (mA)">Grün (mA)</span><input id="ledCurrentG" type="number" min="0" max="100" step="0.1" value="2"></label><label><span data-i18n="Blau (mA)">Blau (mA)</span><input id="ledCurrentB" type="number" min="0" max="100" step="0.1" value="2"></label></div>
+<div class="row"><label><span data-i18n="Versorgung (V)">Versorgung (V)</span><input id="ledVoltage" type="number" min="0.1" max="60" step="0.1" value="3"></label><label><span data-i18n="Zusatzstrom im Puls (mA)">Zusatzstrom im Puls (mA)</span><input id="ledExtraCurrent" type="number" min="0" max="500" step="0.1" value="0"></label></div></details>
+<p id="ledEnergyNote" class="hint"></p></section>
+<section><h2><span>04</span> <span data-i18n="JSON &amp; Displaytest">JSON &amp; Displaytest</span></h2><label><span data-i18n="LED-Design als JSON">LED-Design als JSON</span><textarea id="ledJSON" rows="9" readonly spellcheck="false"></textarea></label><div class="row wrap"><button id="ledDownload"><span data-i18n="JSON herunterladen">JSON herunterladen</span></button><button id="ledCopy"><span data-i18n="JSON kopieren">JSON kopieren</span></button></div><details><summary><span data-i18n="OEPL-Datenpaket">OEPL-Datenpaket</span></summary><code id="ledPattern"></code><p class="hint"><span data-i18n="Der AP erwartet /led_flash mit MAC und diesem Hex-Muster. Das Design-JSON ist das Austauschformat dieses Werkzeugs; es wird beim Senden in den LED-Befehl übersetzt. Kein Bild-Template wird verändert.">Der AP erwartet /led_flash mit MAC und diesem Hex-Muster. Das Design-JSON ist das Austauschformat dieses Werkzeugs; es wird beim Senden in den LED-Befehl übersetzt. Kein Bild-Template wird verändert.</span></p></details>
+<div class="row wrap"><label><span data-i18n="AP-Adresse">AP-Adresse</span><input id="ledAP" list="ledKnownAPs" placeholder="http://192.168.1.50"></label><datalist id="ledKnownAPs"></datalist><button id="ledConnect"><span data-i18n="Displays laden">Displays laden</span></button><button id="ledUseImageAP"><span data-i18n="AP aus Bildstudio">AP aus Bildstudio</span></button></div>
+<label>Display<select id="ledTargets"><option value="" data-i18n="Zuerst Displays laden">Zuerst Displays laden</option></select></label><label>Display-MAC<input id="ledMAC" maxlength="23" placeholder="0011223344556677"></label><p id="ledTargetInfo" class="hint"><span data-i18n="Firmwareprofil manuell auswählen. Die Displaybezeichnung des APs reicht zur Bestimmung des Profils nicht aus.">Firmwareprofil manuell auswählen. Die Displaybezeichnung des APs reicht zur Bestimmung des Profils nicht aus.</span></p>
+<div class="row wrap"><button id="ledSend" class="primary"><span data-i18n="Sequenz am Display testen">Sequenz am Display testen</span></button><button id="ledStop"><span data-i18n="LED-Stopp senden">LED-Stopp senden</span></button></div><p class="hint"><span data-i18n="Nur diese Schaltflächen senden LED-Befehle. Das Display führt sie bei seiner nächsten Verbindung aus. „Pause“ stoppt ausschließlich die Browser-Simulation. Ein laufender Hardwarebefehl kann je nach Firmware erst beim nächsten Empfang gestoppt werden.">Nur diese Schaltflächen senden LED-Befehle. Das Display führt sie bei seiner nächsten Verbindung aus. „Pause“ stoppt ausschließlich die Browser-Simulation. Ein laufender Hardwarebefehl kann je nach Firmware erst beim nächsten Empfang gestoppt werden.</span></p>
+</section></div></div></div>
+</main><div id="activityStatus" class="activityStatus" role="region" aria-label="Aktionsstatus" data-i18n-aria-label="Aktionsstatus" hidden><span class="activityGears" aria-hidden="true"><svg class="activityGearsSvg" viewBox="0 0 33 33" aria-hidden="true" focusable="false"><g transform="translate(12 12)"><g class="activityGearLarge"><path fill="currentColor" fill-rule="evenodd" d="M8.0378 -3.3293 L8.4267 -2.1636 L11.1873 -1.5922 L11.1873 1.5922 L8.4267 2.1636 L8.0378 3.3293 L7.4885 4.4287 L9.0364 6.7847 L6.7847 9.0364 L4.4287 7.4885 L3.3293 8.0378 L2.1636 8.4267 L1.5922 11.1873 L-1.5922 11.1873 L-2.1636 8.4267 L-3.3293 8.0378 L-4.4287 7.4885 L-6.7847 9.0364 L-9.0364 6.7847 L-7.4885 4.4287 L-8.0378 3.3293 L-8.4267 2.1636 L-11.1873 1.5922 L-11.1873 -1.5922 L-8.4267 -2.1636 L-8.0378 -3.3293 L-7.4885 -4.4287 L-9.0364 -6.7847 L-6.7847 -9.0364 L-4.4287 -7.4885 L-3.3293 -8.0378 L-2.1636 -8.4267 L-1.5922 -11.1873 L1.5922 -11.1873 L2.1636 -8.4267 L3.3293 -8.0378 L4.4287 -7.4885 L6.7847 -9.0364 L9.0364 -6.7847 L7.4885 -4.4287 Z M3.0 0 A3.0 3.0 0 1 0 -3.0 0 A3.0 3.0 0 1 0 3.0 0 Z"/></g></g><g transform="translate(23.490485 23.490485)"><g class="activityGearSmall"><path fill="currentColor" fill-rule="evenodd" d="M4.0046 -2.9095 L4.5551 -1.9373 L7.3577 -1.6932 L7.3577 1.6932 L4.5551 1.9373 L4.0046 2.9095 L3.2501 3.7335 L3.8840 6.4743 L0.6633 7.5208 L-0.4349 4.9309 L-1.5296 4.7077 L-2.5465 4.2448 L-4.9572 5.6946 L-6.9478 2.9549 L-4.8239 1.1101 L-4.9500 0.0000 L-4.8239 -1.1101 L-6.9478 -2.9549 L-4.9572 -5.6946 L-2.5465 -4.2448 L-1.5296 -4.7077 L-0.4349 -4.9309 L0.6633 -7.5208 L3.8840 -6.4743 L3.2501 -3.7335 Z M2.0 0 A2.0 2.0 0 1 0 -2.0 0 A2.0 2.0 0 1 0 2.0 0 Z"/></g></g></svg></span><span class="activityResultIcon" aria-hidden="true"></span><div class="activityBody"><strong id="activityCount"></strong><div id="activityMessage"></div></div><button id="activityDismiss" type="button" hidden><span data-i18n="Ausblenden">Ausblenden</span></button></div><footer><span data-i18n="OEPL-Toolbox · Unabhängiges Projekt, nicht mit dem OpenEPaperLink-Projekt verbunden.">OEPL-Toolbox · Unabhängiges Projekt, nicht mit dem OpenEPaperLink-Projekt verbunden.</span> <a href="README.md"><span data-i18n="Anleitung &amp; technische Hinweise">Anleitung &amp; technische Hinweise</span></a></footer></body></html>

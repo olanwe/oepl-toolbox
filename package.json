@@ -1,0 +1,11 @@
+{
+  "name": "oepl-toolbox",
+  "version": "2.20.1",
+  "private": true,
+  "description": "Offline browser image editor for OpenEPaperLink",
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "build": "node build.cjs",
+    "build:converter": "node build-image-converter.cjs"
+  }
+}

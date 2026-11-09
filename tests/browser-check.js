@@ -1,0 +1,80 @@
+async (page) => {
+  const checks = [];
+  const ensure = (condition, name) => { if (!condition) throw Error(name); checks.push(name); };
+  const errors = []; page.on('pageerror', error => errors.push(error.message));
+  await page.setViewportSize({width:1500,height:1000});
+  await page.goto('http://127.0.0.1:8766/img2vlw.html');
+  await page.getByRole('button', {name:'Beispiel laden'}).click();
+  await page.waitForFunction(() => !document.getElementById('png').disabled);
+  ensure(await page.locator('#sourceInfo').textContent() === '888 × 384 px', 'demo source');
+  await page.locator('#palette').selectOption('BWRY');
+  await page.locator('#dither').selectOption('floyd');
+  await page.locator('#cropMode').check();
+  await page.locator('#source').scrollIntoViewIfNeeded();
+  const box = await page.locator('#source').boundingBox();
+  await page.mouse.move(box.x+box.width*.2,box.y+box.height*.2); await page.mouse.down();
+  await page.mouse.move(box.x+box.width*.8,box.y+box.height*.8,{steps:3}); await page.mouse.up();
+  ensure(Number(await page.locator('#cropW').inputValue()) < 888 && Number(await page.locator('#cropX').inputValue()) > 0, 'pointer crop');
+  await page.locator('#resetCrop').click();
+  await page.locator('#size').selectOption('400x300');
+  await page.waitForFunction(() => document.getElementById('targetInfo').textContent === '400 × 300 px');
+  ensure(await page.locator('#png').isEnabled(), 'resized target');
+  await page.locator('#width').fill('0');
+  await page.waitForFunction(() => document.getElementById('png').disabled);
+  ensure(await page.locator('#vlw').isDisabled(), 'invalid size prevents stale export');
+  await page.locator('#width').fill('400');
+  await page.locator('#settings summary').first().click();
+  await page.locator('#presetName').fill('Testpalette');
+  await page.locator('#customColors').fill('#ffffff, #000000, #00aaff');
+  await page.locator('#savePreset').click();
+  ensure(await page.locator('#palette').inputValue() === 'custom:Testpalette', 'save custom preset');
+  await page.reload();
+  ensure(await page.locator('#palette option[value="custom:Testpalette"]').count() === 1, 'persist custom preset');
+  const fixture = await page.evaluate(() => {
+    const c = document.createElement('canvas'); c.width=4;c.height=2;
+    c.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray([255,0,0,255,255,255,0,128,255,255,255,0,0,0,0,255,255,255,255,255,0,0,0,255,255,0,0,0,255,255,0,255]),4,2),0,0);
+    return c.toDataURL().split(',')[1];
+  });
+  await page.locator('#file').setInputFiles({name:'alpha.png',mimeType:'image/png',buffer:Buffer.from(fixture,'base64')});
+  await page.locator('#palette').selectOption('BWRY');
+  await page.locator('#width').fill('4'); await page.locator('#height').fill('2');
+  await page.waitForFunction(() => document.getElementById('target').width===4 && !document.getElementById('png').disabled);
+  const rgba = await page.locator('#target').evaluate(c => Array.from(c.getContext('2d').getImageData(0,0,4,2).data));
+  ensure(rgba[3]===255 && rgba[7]===128 && rgba[11]===0 && rgba[27]===0, 'transparent and partial alpha preserved');
+  const files = [];
+  for (const id of ['png','jpeg','vlw']) {
+    const wait=page.waitForEvent('download'); await page.locator('#'+id).click(); const download=await wait;
+    ensure((await download.failure()) === null, id+' download'); files.push(download.suggestedFilename());
+  }
+  await page.getByText('VLW-Einstellungen & Verwendung',{exact:true}).click();
+  ensure((await page.locator('#vlwInfo').textContent()).includes('Deckungsmaske'), 'VLW mask mapping');
+  await page.locator('#xpatch').check();
+  await page.waitForFunction(() => document.getElementById('vlwInfo').textContent.includes('harte Transparenz'));
+  ensure((await page.locator('#vlwInfo').textContent()).includes('harte Transparenz'), 'unsafe partial-alpha patch blocked');
+  await page.locator('#xpatch').uncheck();
+  const uploads=[];
+  await page.route('http://mock-ap.test/**', async route => {
+    const request=route.request(), path=new URL(request.url()).pathname;
+    const headers={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'content-type','Access-Control-Allow-Methods':'GET,POST,OPTIONS'};
+    if(request.method()==='OPTIONS') return route.fulfill({status:204,headers});
+    if(path==='/get_db') return route.fulfill({json:{tags:[{mac:'0011223344556677',alias:'Testdisplay',hwType:1,ver:1}]},headers});
+    if(path==='/tagtypes/01.json') return route.fulfill({json:{width:8,height:1,bpp:2,colortable:{white:[255,255,255],black:[0,0,0],red:[255,0,0]},rotatebuffer:0},headers});
+    if(path==='/imgupload') { uploads.push(request.postDataBuffer().toString('latin1')); return route.fulfill({status:200,body:'OK',headers}); }
+    return route.fulfill({status:404,headers});
+  });
+  await page.locator('#apAddress').fill('http://mock-ap.test'); await page.locator('#connect').click();
+  await page.waitForFunction(() => document.getElementById('tags').options.length===2);
+  await page.locator('#tags').selectOption('0'); await page.waitForFunction(() => !document.getElementById('profile').disabled);
+  await page.locator('#send').click();
+  await page.waitForFunction(() => document.getElementById('notice').textContent.includes('Bildgröße passt nicht'));
+  ensure(uploads.length===0 && (await page.locator('#notice').textContent()).includes('Bildgröße passt nicht'), 'wrong-size upload blocked');
+  await page.locator('#profile').click(); await page.waitForFunction(() => document.getElementById('target').width===8 && !document.getElementById('send').disabled);
+  await page.locator('#send').click(); await page.waitForFunction(() => document.getElementById('notice').textContent.includes('angenommen'));
+  ensure(uploads.length===1 && uploads[0].includes('name="dither"') && uploads[0].includes('filename="image.jpg"'), 'mock upload contract');
+  await page.unroute('http://mock-ap.test/**');
+  await page.setViewportSize({width:390,height:844}); await page.evaluate(() => window.scrollTo(0,0));
+  ensure(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'mobile has no horizontal overflow');
+  await page.screenshot({path:'output/playwright/studio-mobile.png',fullPage:true});
+  ensure(errors.length===0,'no browser exceptions');
+  return {checks,files,errors};
+}
