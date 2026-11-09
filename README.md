@@ -16,9 +16,13 @@ Beide Bilder sind 400 × 300 Pixel groß. Die Ausgabe enthält ausschließlich w
 
 ## Schnellstart
 
+[**Toolbox direkt im Browser öffnen**](https://htmlpreview.github.io/?https://github.com/olanwe/oepl-toolbox/blob/main/oepl-toolbox.html) – über den externen Dienst GitHub HTML Preview, ohne Download.
+
+Für den Zugriff auf einen lokalen HTTP-AP empfiehlt sich die lokal gespeicherte Datei; die HTTPS-Vorschau kann dabei durch Browser-Sicherheitsregeln eingeschränkt sein.
+
 Die fertige [oepl-toolbox.html](oepl-toolbox.html) mit GitHubs „Download raw file“ herunterladen und lokal im Browser öffnen. Die Einzeldatei enthält alle benötigten Bestandteile. Bildbearbeitung und LED-Simulation funktionieren offline; nur Verbindungen zu einem AP benötigen Netzwerkzugriff.
 
-Aus dem Quellcode lässt sich alternativ `img2vlw.html` öffnen; `style.css`, `js/` und `vendor/` bleiben daneben. `legacy.html` enthält die ursprüngliche Anwendung. Der ioBroker-Kalender ist ein separates Projekt und gehört nicht zu diesem Repository.
+Aus dem Quellcode lässt sich alternativ `img2vlw.html` öffnen; `style.css`, `js/` und `vendor/` bleiben daneben. `legacy.html` enthält die ursprüngliche Anwendung.
 
 ## Bilder vorbereiten
 

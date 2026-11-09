@@ -16,9 +16,13 @@ Both images are 400 × 300 pixels. The output contains only white, black, red an
 
 ## Getting started
 
+[**Open the Toolbox directly in your browser**](https://htmlpreview.github.io/?https://github.com/olanwe/oepl-toolbox/blob/main/oepl-toolbox.html) – through the external GitHub HTML Preview service, without downloading.
+
+For access to a local HTTP AP, use the downloaded file; browser security rules may restrict such connections from the HTTPS preview.
+
 Download [oepl-toolbox.html](oepl-toolbox.html) using GitHub’s “Download raw file” button and open it locally. The single file contains all required components. Image editing and LED simulation work offline; only AP connections need network access.
 
-From a source checkout, open `img2vlw.html` with `style.css`, `js/` and `vendor/` alongside it. `legacy.html` preserves the original application. The ioBroker calendar is a separate project and is not included here.
+From a source checkout, open `img2vlw.html` with `style.css`, `js/` and `vendor/` alongside it. `legacy.html` preserves the original application.
 
 ## Image preparation
 

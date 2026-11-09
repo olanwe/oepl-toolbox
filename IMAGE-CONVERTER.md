@@ -1,6 +1,6 @@
 # OEPL Image Converter 1.1.0
 
-Gemeinsamer, reiner Konvertierungskern der OEPL-Toolbox und der Anlassbilder im ioBroker-Kalenderdienst. Ohne Dateizugriffe, Netzwerk, Timer oder externe Laufzeitabhängigkeiten. GPL-3.0; keine offizielle OpenEPaperLink-Komponente.
+Reiner Konvertierungskern der OEPL-Toolbox, auch unabhängig in andere Anwendungen einbindbar. Ohne Dateizugriffe, Netzwerk, Timer oder externe Laufzeitabhängigkeiten. GPL-3.0; keine offizielle OpenEPaperLink-Komponente.
 
 ## Node.js
 
@@ -51,12 +51,12 @@ Feste Mischfarben verwenden reine Farben und gleichmäßig gewichtete Kombinatio
 
 ## Gemeinsame Quellen
 
-`src/js/image-converter.js`: Palette, Lab-Zuordnung, Korrekturen, Floyd und Bayer.
-`src/js/gamut.js`: RGB-Farbraumprojektion.
-`src/js/fixed-mix.js`: feste Mischungen.
-`src/js/image-api.js`: validierte RGBA-Schnittstelle.
+`js/image-converter.js`: Palette, Lab-Zuordnung, Korrekturen, Floyd und Bayer.
+`js/gamut.js`: RGB-Farbraumprojektion.
+`js/fixed-mix.js`: feste Mischungen.
+`js/image-api.js`: validierte RGBA-Schnittstelle.
 
-`node src/build-image-converter.cjs oepl-image-converter.js` erzeugt das eigenständige UMD-Bundle. Dieselben Quelldateien laufen direkt in der Toolbox. Die ioBroker-Fabrik wird vom selben Builder erzeugt und lokal im Dienst eingebettet; kein globales ioBroker-Skript und kein zusätzliches npm-Modul nötig. Ausgabe nach Änderungen neu bauen und Tests ausführen.
+`node build-image-converter.cjs oepl-image-converter.js` erzeugt das eigenständige UMD-Bundle. Dieselben Quelldateien laufen direkt in der Toolbox. Der Builder unterstützt außerdem eine einbettbare Factory für andere Anwendungen. Ausgabe nach Änderungen neu bauen und Tests ausführen.
 
 
 ## Linien-, Farbstrich- und Textoptimierung (1.1.0)
@@ -89,4 +89,4 @@ const result=converter.illustration.apply(output,masks,colors,options);
 
 `resizeCoverage` / `resizePlanes` sind reine, portable Funktionen (Flächenmittel beim Verkleinern, bilinear beim Vergrößern), ohne Canvas oder zusätzliche Bibliotheken. `prepare` verändert die Eingabe nicht. `resizeMasks` ist die zusätzliche Browser-Canvas-Variante mit Bildplatzierung und wird unter Node nicht benötigt. Die Maskenrasterung kann sich je nach benutztem Bildskalierer etwas von der Browser-Vorschau unterscheiden; die Erkennung und Anwendung verwenden dieselben Quellen.
 
-Der ioBroker-Kalenderdienst nutzt diese getrennte Verarbeitung und begrenzt die Quellanalyse wie der Editor auf 2 Millionen Pixel. Bildmasken werden vor der endgültigen Palettenkonvertierung vorbereitet und danach angewendet. Kalendertext und Warnmeldungen bleiben davon getrennt.
+Der Editor begrenzt die Quellanalyse auf 2 Millionen Pixel. Bildmasken werden vor der endgültigen Palettenkonvertierung vorbereitet und danach angewendet. Andere Anwendungen können diese getrennte Verarbeitung ebenfalls nutzen.

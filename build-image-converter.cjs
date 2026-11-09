@@ -1,4 +1,4 @@
-// Bundle the shared pure converter for Node.js, browsers and an embedded ioBroker factory.
+// Bundle the shared pure converter for Node.js, browsers and an embeddable factory.
 const fs=require('node:fs'),path=require('node:path');
 function factory(){
  const names=['gamut.js','fixed-mix.js','image-converter.js','illustration.js','image-api.js'];
