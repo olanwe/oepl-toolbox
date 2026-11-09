@@ -6,6 +6,14 @@ Independent project; not an official OpenEPaperLink application and not affiliat
 
 [Deutsche Dokumentation](README.md)
 
+## Rendering example: four display colors, more tones
+
+| AI-generated source | BWRY · fixed mixtures, up to 2 colors per tone |
+|---|---|
+| ![Source comic with a garden and bicycle](docs/examples/comic-source.png) | ![BWRY output with olive vegetation, orange hair and a red shirt](docs/examples/comic-bwry.png) |
+
+Both images are 400 × 300 pixels. The output contains only white, black, red and yellow pixels: black/yellow appears olive, red/yellow orange and white/red pink. It was rendered with the unmodified Toolbox converter. Perceived colors depend on the panel and viewing distance. [Source and settings](docs/examples/README.md).
+
 ## Getting started
 
 Download [oepl-toolbox.html](oepl-toolbox.html) using GitHub’s “Download raw file” button and open it locally. The single file contains all required components. Image editing and LED simulation work offline; only AP connections need network access.

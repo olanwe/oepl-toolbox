@@ -6,6 +6,14 @@ Unabhängiges Projekt; keine offizielle Anwendung des OpenEPaperLink-Projekts un
 
 [English documentation](README.en.md)
 
+## Renderbeispiel: vier Displayfarben, mehr Farbtöne
+
+| KI-generierte Vorlage | BWRY · feste Mischfarben, bis zu 2 Farben pro Mischton |
+|---|---|
+| ![Comicvorlage mit Garten und Fahrrad](docs/examples/comic-source.png) | ![BWRY-Ausgabe mit olivgrüner Vegetation, orangefarbenen Haaren und rotem Shirt](docs/examples/comic-bwry.png) |
+
+Beide Bilder sind 400 × 300 Pixel groß. Die Ausgabe enthält ausschließlich weiße, schwarze, rote und gelbe Pixel: Schwarz/Gelb wirkt oliv, Rot/Gelb orange und Weiß/Rot rosa. Das Ergebnis stammt aus dem unveränderten Toolbox-Konverter. Die Farbwahrnehmung hängt vom Panel und Betrachtungsabstand ab. [Vorlage und Einstellungen](docs/examples/README.md).
+
 ## Schnellstart
 
 Die fertige [oepl-toolbox.html](oepl-toolbox.html) mit GitHubs „Download raw file“ herunterladen und lokal im Browser öffnen. Die Einzeldatei enthält alle benötigten Bestandteile. Bildbearbeitung und LED-Simulation funktionieren offline; nur Verbindungen zu einem AP benötigen Netzwerkzugriff.
