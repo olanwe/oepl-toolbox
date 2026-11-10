@@ -8,6 +8,18 @@ Independent project; not an official OpenEPaperLink application and not affiliat
 
 ## Rendering example: four display colors, more tones
 
+### Photograph with Floyd–Steinberg
+
+| AI-generated source | BWRY · Floyd–Steinberg | Distance preview |
+|---|---|---|
+| ![Source portrait with blue eyes, red and yellow tulips and green leaves](docs/examples/portrait-source.png) | ![Floyd–Steinberg output containing only white, black, red and yellow pixels](docs/examples/portrait-bwry.png) | ![Smoothed BWRY output approximating viewing from a greater distance](docs/examples/portrait-distance.png) |
+
+7.5-inch format in portrait orientation: **480 × 800 pixels** (native 800 × 480, rotated 90°). The source was center-cropped to the target aspect ratio. The eyes and sweater may still appear cool or bluish, although the display file contains only white, black, red and yellow.
+
+The distance preview applies **1.2-pixel Gaussian blur to the native-sized output, before any display scaling**. Only this preview image contains additional intermediate RGB colors; the display file remains unchanged. It illustrates spatial averaging rather than a calibrated viewing distance. [Display PNG](docs/examples/portrait-bwry.png) · [Settings and provenance](docs/examples/README.md).
+
+### Comic with fixed mixtures
+
 | AI-generated source | BWRY · fixed mixtures, up to 2 colors per tone |
 |---|---|
 | ![Source comic with a garden and bicycle](docs/examples/comic-source.png) | ![BWRY output with olive vegetation, orange hair and a red shirt](docs/examples/comic-bwry.png) |

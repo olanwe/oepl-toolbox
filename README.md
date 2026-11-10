@@ -8,6 +8,18 @@ Unabhängiges Projekt; keine offizielle Anwendung des OpenEPaperLink-Projekts un
 
 ## Renderbeispiel: vier Displayfarben, mehr Farbtöne
 
+### Foto mit Floyd–Steinberg
+
+| KI-generierte Vorlage | BWRY · Floyd–Steinberg | Entfernungsvorschau |
+|---|---|---|
+| ![Fotovorlage mit blauen Augen, roter und gelber Tulpe sowie grünen Blättern](docs/examples/portrait-source.png) | ![Floyd–Steinberg-Ausgabe mit ausschließlich weißen, schwarzen, roten und gelben Pixeln](docs/examples/portrait-bwry.png) | ![Geglättete Ansicht der BWRY-Ausgabe zur Annäherung an die Betrachtung aus größerer Entfernung](docs/examples/portrait-distance.png) |
+
+7,5-Zoll-Format im Hochformat: **480 × 800 Pixel** (nativ 800 × 480, um 90° gedreht). Die Vorlage wurde mittig auf das Seitenverhältnis zugeschnitten. Auch Augen und Pullover können noch kühl oder bläulich wirken, obwohl die Displaydatei ausschließlich Weiß, Schwarz, Rot und Gelb enthält.
+
+Die Entfernungsvorschau glättet die fertige Ausgabe mit **1,2 Pixel Gauß-Unschärfe in nativer Auflösung, vor jeder Anzeigeskalierung**. Nur diese Vorschaugrafik enthält zusätzliche RGB-Zwischentöne; die Displaydatei bleibt unverändert. Sie veranschaulicht die optische Mittelung und entspricht keinem kalibrierten Betrachtungsabstand. [PNG für das Display](docs/examples/portrait-bwry.png) · [Einstellungen und Herkunft](docs/examples/README.md).
+
+### Comic mit festen Mischfarben
+
 | KI-generierte Vorlage | BWRY · feste Mischfarben, bis zu 2 Farben pro Mischton |
 |---|---|
 | ![Comicvorlage mit Garten und Fahrrad](docs/examples/comic-source.png) | ![BWRY-Ausgabe mit olivgrüner Vegetation, orangefarbenen Haaren und rotem Shirt](docs/examples/comic-bwry.png) |
