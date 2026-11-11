@@ -21,6 +21,10 @@
   constructor(){this.source=document.createElement('canvas');this.padded=document.createElement('canvas');this.filtered=document.createElement('canvas');this.key=null;this.radius=0;}
   paint(ctx,pixels,amount){
    const radius=Math.max(0,Math.min(4,Number(amount)||0)),{width:w,height:h}=pixels;
+   if(pixels.reflectancePreview){
+    if(this.key!==pixels||this.radius!==radius){const {colors,model}=pixels.reflectancePreview;this.filtered.width=w;this.filtered.height=h;this.filtered.getContext('2d').putImageData(new ImageData(root.Reflectance.preview(pixels.data,w,h,colors,model,radius),w,h),0,0);this.key=pixels;this.radius=radius;}
+    ctx.save();ctx.filter='none';ctx.clearRect(0,0,w,h);ctx.drawImage(this.filtered,0,0);ctx.restore();return;
+   }
    if(!radius){ctx.putImageData(new ImageData(pixels.data,w,h),0,0);return;}
    if(this.key!==pixels||this.radius!==radius){
     this.source.width=w;this.source.height=h;this.source.getContext('2d').putImageData(new ImageData(pixels.data,w,h),0,0);this.filtered.width=w;this.filtered.height=h;

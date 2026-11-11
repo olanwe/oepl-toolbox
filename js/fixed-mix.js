@@ -3,15 +3,16 @@
  'use strict';
  function prepare(palette,{maxColors=2,biases=[],toLab}={}){
   if(!Number.isInteger(maxColors)||maxColors<1||maxColors>4)throw Error('maxColors: 1–4');
-  const limit=Math.min(maxColors,palette.length),candidates=[],unique=new Set();
+  const limit=Math.min(maxColors,palette.length),candidates=[],unique=new Map(),pureCandidates=new Map();
   function add(indices){
    const rgb=[0,1,2].map(k=>indices.reduce((sum,i)=>sum+palette[i][k],0)/indices.length),key=rgb.map(v=>v.toFixed(5)).join(',');
-   if(unique.has(key))return;unique.add(key);
+   if(unique.has(key)){if(indices.length===1)pureCandidates.set(rgb.join(','),unique.get(key));return;}
+   unique.set(key,candidates.length);if(indices.length===1)pureCandidates.set(rgb.join(','),candidates.length);
    candidates.push({indices,rgb,lab:toLab(rgb),bias:indices.reduce((sum,i)=>sum+(biases[i]||0),0)/indices.length*650/19.5075});
   }
   function visit(start,indices,size){if(indices.length===size){add(indices);return;}for(let i=start;i<=palette.length-(size-indices.length);i++)visit(i+1,indices.concat(i),size);}
   for(let size=1;size<=limit;size++)visit(0,[],size);
-  const exact=new Map();if(!biases.some(Boolean))palette.forEach((rgb,i)=>exact.set(rgb.join(','),i));
+  const exact=biases.some(Boolean)?new Map():pureCandidates;
   const cache=new Int16Array(32768);cache.fill(-1);
   function choose(rgb){
    const pure=exact.get(rgb.join(','));if(pure!==undefined)return pure;

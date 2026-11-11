@@ -2,7 +2,8 @@
 (function(root){
  'use strict';
  class DrawingEditor{
-  constructor({target,colors,onChange,message,blank,preview}){
+  constructor({target,colors,onChange,message,blank,preview,quantizeOptions=()=>({})}){
+   this.quantizeOptions=quantizeOptions;
    this.target=target;this.preview=preview;this.colors=colors;this.onChange=onChange;this.message=message;this.history=new DrawingLayer.History();this.state=null;this.pending=null;this.gesture=null;this.stamp=null;this.cache=null;this.loadVersion=0;this.selectedId=null;this.nextId=0;
    const $=id=>document.getElementById(id);this.$=$;
    $('drawingEnabled').onchange=()=>{if(this.active&&!this.state)this.message(I18N.t('Bitte zuerst ein Bild laden oder eine leere Zeichenfläche anlegen.'),true);this.cancel();this.refresh();onChange();};
@@ -50,10 +51,10 @@
   invalidate(){this.cancel();this.state=null;}
   raster(w,h){
    if(!this.visible||!this.history.position)return null;
-   const key=JSON.stringify([w,h,this.history.version,this.colors()]);if(this.cache?.key===key)return this.cache.pixels;
+   const options=this.quantizeOptions(),key=JSON.stringify([w,h,this.history.version,this.colors(),options]);if(this.cache?.key===key)return this.cache.pixels;
    const canvas=DrawingLayer.render(w,h,this.history.operations),data=canvas.getContext('2d').getImageData(0,0,w,h).data;
    for(let i=3;i<data.length;i+=4)data[i]=data[i]>=128?255:0;
-   const pixels=EP.quantize(data,w,h,this.colors(),{dither:'none'});this.cache={key,pixels};return pixels;
+   const pixels=EP.quantize(data,w,h,this.colors(),{...options,dither:'none'});this.cache={key,pixels};return pixels;
   }
   point(event){const r=this.target.getBoundingClientRect();const x=Math.max(0,Math.min(this.target.width-1,Math.floor((event.clientX-r.left)*this.target.width/r.width)))+.5,y=Math.max(0,Math.min(this.target.height-1,Math.floor((event.clientY-r.top)*this.target.height/r.height)))+.5;return {x,y};}
   operation(point){

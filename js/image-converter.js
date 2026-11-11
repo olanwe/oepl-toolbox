@@ -29,9 +29,21 @@
     if (!Number.isInteger(w) || !Number.isInteger(h) || w < 1 || h < 1 || w > 4096 || h > 4096 || w * h > 4000000)
       throw Error(t('Abmessungen: 1–4096 px, insgesamt höchstens 4 Millionen Pixel.'));
   }
+  function renderPalette(colors, renderColors) {
+    if (renderColors === undefined) return colors.map(rgb);
+    if (!Array.isArray(renderColors) || renderColors.length !== colors.length || renderColors.some(c => typeof c !== 'string' || !/^#[0-9a-f]{6}$/i.test(c)))
+      throw Error('renderColors: one #RRGGBB value per output color required.');
+    return renderColors.map(rgb);
+  }
   function quantize(data, width, height, colors, options = {}) {
     dimensions(width, height);
-    const palette = colors.map(rgb), indices = new Uint8Array(width * height);
+    const outputPalette = colors.map(rgb), profilePalette = renderPalette(colors, options.renderColors);
+    // Continuous preparation is left to the AP; profiles apply to local quantization.
+    const palette = ['rgb','gamut'].includes(options.dither) ? outputPalette : profilePalette;
+    // Explicit drawing colors retain their selected output index. Inserted image
+    // intermediate colors still use the profile, while source photos do not opt in.
+    const exactNominal=options.exactNominal?new Map(outputPalette.map((c,i)=>[c.join(','),i])):null;
+    const indices = new Uint8Array(width * height);
     const out = new Uint8ClampedArray(data.length), work = new Float32Array(width * height * 3);
     const {brightness = 0, contrast = 1, saturation = 1, threshold = 128, dither = 'none', strength = 1, biases = []} = options;
     for (let p = 0; p < indices.length; p++) {
@@ -49,11 +61,12 @@
       }
       return {data:out,indices,width,height,continuous:true};
     }
+    if(options.reflectance){const renderer=root.Reflectance||(typeof module!=='undefined'?require('./reflectance.js'):null);return renderer.quantize(data,width,height,colors,options,work);}
     if(dither==='fixed'){
       const mixing=fixedMix.prepare(palette,{maxColors:options.mixColors??2,biases,toLab:rgbToLab});
       for(let y=0;y<height;y++)for(let x=0;x<width;x++){
         const p=y*width+x,mix=mixing.choose([work[p*3],work[p*3+1],work[p*3+2]]),chosen=mixing.index(mix,x,y);
-        indices[p]=chosen;out.set(palette[chosen],p*4);out[p*4+3]=data[p*4+3];
+        indices[p]=chosen;out.set(outputPalette[chosen],p*4);out[p*4+3]=data[p*4+3];
       }
       return {data:out,indices,width,height};
     }
@@ -120,10 +133,10 @@
       const p = y * width + x;
       const c = [work[p*3], work[p*3+1], work[p*3+2]];
       // The same perceptual decision is used at every strength and in every mode.
-      let chosen = nearestPerceptual(c, dither === 'floyd' && strength > 0 ? strength : 1);
+      let chosen = exactNominal?.get(c.join(',')) ?? nearestPerceptual(c, dither === 'floyd' && strength > 0 ? strength : 1);
       if (dither === 'ordered') chosen = orderedColor(c, chosen, bayer[(y%4)*4+x%4]);
       indices[p] = chosen;
-      for (let k = 0; k < 3; k++) out[p * 4 + k] = palette[chosen][k];
+      for (let k = 0; k < 3; k++) out[p * 4 + k] = outputPalette[chosen][k];
       out[p * 4 + 3] = data[p * 4 + 3];
       if (dither === 'floyd' && strength > 0 && data[p * 4 + 3]) {
         for (const [dx, dy, weight] of [[1, 0, 7], [-1, 1, 3], [0, 1, 5], [1, 1, 1]]) {
@@ -134,6 +147,6 @@
     }
     return {data: out, indices, width, height};
   }
-  root.OEPLImage = {version:'1.0.0',palettes,rgb,rgbToLab,dimensions,quantize};
+  root.OEPLImage = {version:'1.0.0',palettes,rgb,rgbToLab,dimensions,renderPalette,quantize};
   if(typeof module!=='undefined')module.exports=root.OEPLImage;
 })(typeof window!=='undefined'?window:globalThis);

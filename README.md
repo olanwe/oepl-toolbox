@@ -58,6 +58,10 @@ Aus dem Quellcode lässt sich alternativ `img2vlw.html` öffnen; `style.css`, `j
 
 Die Grenze von 1–4 betrifft die beteiligten Displayfarben **pro Mischton**, nicht die Zahl der Farbtöne im ganzen Bild. Bei BWRY kann beispielsweise ein Schwarz/Gelb-Muster wie Oliv wirken; die Datei enthält weiterhin ausschließlich die tatsächlichen Palettenfarben. Physische Pigmentmischungen werden nicht kalibriert simuliert.
 
+Ein getrenntes **Farbprofil für die Berechnung** berücksichtigt abweichende Panelfarben bei Farbzuordnung und Dithering, während Exporte ihre nominalen OEPL-Farbcodes behalten. Idealisiert bleibt das bisherige Verhalten. Passende eigene Profile sind mit Farbpickern bearbeitbar, lokal speicherbar und als JSON austauschbar. AP-Wahrnehmungsfarben können optional zusammen mit dem Displayprofil übernommen werden; eigene Zuordnungen bleiben pro Display erhalten. Die Vorschau lässt sich unabhängig idealisiert oder mit Profilfarben anzeigen. [Bedienung, Datenformat und Grenzen](COLOR-PROFILES.md).
+
+Als einziges Korrekturpreset wird eine generische BWRY-Näherung mitgeliefert. Alternativ lässt sich ohne Profil rechnen oder ein eigenes Profil erstellen und importieren. Profilhelligkeit und Rasterkennlinie sind einstellbar; unnormalisierte Referenzen bleiben zum Vergleich erhalten.
+
 Quell- und Zielansicht besitzen getrennten Anzeigezoom und Navigation per Maus/Touch. Die Arbeitsfläche lässt sich vergrößern; die Vorschau bleibt beim Bearbeiten möglichst sichtbar. Die Entfernungsvorschau glättet nur die Anzeige in nativer Auflösung vor dem Anzeigezoom. Exportierte Pixel bleiben unverändert.
 
 ## Zeichnen und Testbilder
@@ -113,3 +117,6 @@ Der reine Bildkonverter lässt sich unabhängig einbetten: [Schnittstelle, Optio
 ## Lizenz
 
 GPL-3.0, siehe [LICENSE](LICENSE). Der eingebundene JPEG-Encoder jpeg-js 0.4.4 steht unter BSD-3-Clause, siehe [vendor/jpeg-js.LICENSE](vendor/jpeg-js.LICENSE). Beide Lizenztexte sind auch in der fertigen Einzeldatei enthalten.
+
+
+Optionales Farbmodell: Die generische BWRY-Näherung kombiniert angenäherte Vollfarben mit einer einstellbaren Rasterkennlinie. Auswahl unter Display & Farben → Farbprofil für die Berechnung. Eigene Profile lassen sich kopieren und als JSON austauschen. Grenzen und Rechenweg stehen in der [Farbprofil-Dokumentation](COLOR-PROFILES.md).

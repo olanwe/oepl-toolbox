@@ -1,4 +1,4 @@
-# OEPL Image Converter 1.1.0
+# OEPL Image Converter 1.4.0
 
 Reiner Konvertierungskern der OEPL-Toolbox, auch unabhängig in andere Anwendungen einbindbar. Ohne Dateizugriffe, Netzwerk, Timer oder externe Laufzeitabhängigkeiten. GPL-3.0; keine offizielle OpenEPaperLink-Komponente.
 
@@ -34,6 +34,7 @@ Vorher auf die endgültigen Pixelmaße skalieren/beschneiden. Ausgabe ist RGBA, 
 | Einstellung | Werte / Vorgabe |
 |---|---|
 | `palette` | BW, BWR, BWY, BWRY (Alias BWYR), Spectra3100Plus, Spectra6, ACeP7 oder 2–16 eindeutige `#RRGGBB`; Vorgabe BWRY |
+| `renderColors` | Optional: ein `#RRGGBB`-Referenzwert je nominaler Palettenfarbe, in derselben Reihenfolge; ohne Angabe ideale Palette |
 | `dither` / `dithering` | none, floyd (Alias floyd-steinberg), ordered (Alias bayer), fixed (Alias fixed-mix), rgb, gamut; Vorgabe none |
 | `strength` | 0–1, Vorgabe 1; für Floyd/Bayer |
 | `mixColors` | 1–4, Vorgabe 2; für feste gleichmäßige Mischfarben |
@@ -48,6 +49,32 @@ Vorher auf die endgültigen Pixelmaße skalieren/beschneiden. Ausgabe ist RGBA, 
 RGB erhält korrigierte Farbstufen, gamut begrenzt sie kontinuierlich auf den RGB-Farbraum der Palette. COLOR ist ein Kompatibilitätsalias für kontinuierliche RGB-Ausgabe. Kontinuierliche Ausgabe hat keine gültigen Farbindex-Ebenen; `indices` nur bei quantisierter Ausgabe verwenden.
 
 Feste Mischfarben verwenden reine Farben und gleichmäßig gewichtete Kombinationen bis zur gewünschten Anzahl. Gleiche RGB-Mittelwerte bevorzugen die einfachere Kombination. Die Farbsuche nutzt ein begrenztes 5-Bit-RGB-Gitter. Keine Rauschunterdrückung oder räumliche Segmentierung. Geometrische RGB-Mischungen sind keine Kalibrierung physischer Pigmente.
+
+## Panelreferenzen (1.2.0)
+
+`renderColors` trennt die für die Berechnung verwendeten Referenzfarben von den nominalen Exportfarben. Ohne Dithering, Floyd, Bayer und feste Mischfarben nutzen diese Referenzen; Floyd berechnet auch Gamut-Projektion und Fehlerverteilung damit. Ausgabe und `indices` verweisen weiterhin auf `palette`. Eine Referenzpalette, die mit der nominalen Palette identisch ist, liefert die bisherigen Pixel.
+
+```js
+const image = converter.convert({data: rgbaBuffer, width: 480, height: 800,
+  palette: 'BWRY', dithering: 'floyd', strength: 1,
+  renderColors: ['#ffffff', '#000000', '#ff0000', '#c8c800']
+});
+```
+
+Kontinuierliche Modi `rgb` und `gamut` ignorieren Referenzprofile und bereiten weiterhin Farben für den AP vor. Explizite Linien-/Textschutzmasken geben ihre nominalen Zielfarben aus. `renderColors` sind bereits aufbereitete Referenzen und werden nicht zusätzlich normalisiert. Die RGB-Mischungsmodelle bleiben Näherungen. Profilverwaltung, Herkunft und AP-Übernahme: [COLOR-PROFILES.md](COLOR-PROFILES.md).
+
+## Relative Profilhelligkeit (1.3.0)
+
+Alternativ zu `renderColors` akzeptiert `convert` ein `colorProfile` im dokumentierten Profilformat. Die beiden Optionen sind gegenseitig ausgeschlossen. Das Profil muss zur nominalen Palette passen; `normalization:'relative'` (Vorgabe) bereitet die Referenzen mit Weißpunktanpassung und gemeinsamer L*-Abbildung auf, `normalization:'raw'` verwendet die ursprünglichen RGB-Referenzen. Keine Normalisierung des Quellbildes und keine Änderung der Exportcodes.
+
+```js
+const profile = converter.colorProfiles.builtins[0]; // Generic BWRY approximation
+const image = converter.convert({data: rgbaBuffer, width: 480, height: 800,
+  palette:'BWRY', dithering:'floyd', colorProfile:{...profile, normalization:'relative'}
+});
+```
+
+`converter.colorProfiles` stellt außerdem `validate`, `ordered` (Originalreferenzen), `effective` (wirksame Referenzen) und `normalization` (Verfügbarkeit, sRGB-Begrenzung und Farbwerte) bereit. Die portablen Builds enthalten diese Funktionen und die ursprünglichen Lab-Herstellerdaten ohne externe Laufzeitabhängigkeiten. Annahmen und Berechnung: [COLOR-PROFILES.md](COLOR-PROFILES.md).
 
 ## Gemeinsame Quellen
 
@@ -90,3 +117,21 @@ const result=converter.illustration.apply(output,masks,colors,options);
 `resizeCoverage` / `resizePlanes` sind reine, portable Funktionen (Flächenmittel beim Verkleinern, bilinear beim Vergrößern), ohne Canvas oder zusätzliche Bibliotheken. `prepare` verändert die Eingabe nicht. `resizeMasks` ist die zusätzliche Browser-Canvas-Variante mit Bildplatzierung und wird unter Node nicht benötigt. Die Maskenrasterung kann sich je nach benutztem Bildskalierer etwas von der Browser-Vorschau unterscheiden; die Erkennung und Anwendung verwenden dieselben Quellen.
 
 Der Editor begrenzt die Quellanalyse auf 2 Millionen Pixel. Bildmasken werden vor der endgültigen Palettenkonvertierung vorbereitet und danach angewendet. Andere Anwendungen können diese getrennte Verarbeitung ebenfalls nutzen.
+
+
+## Empirical reflectance model (1.4.0)
+
+A profile may include `mixing: {model: 'power-xyz', exponent: 1.8}`. Exponents 1–3 are accepted; 1 is a linear mixture, while values above 1 approximate stronger fine-pattern darkening. Profiles without this field retain the previous implementation. `BWRY · generische Näherung (feine Raster)` is an optional approximate preset, not a calibrated profile for every BWRY panel.
+
+```js
+const profile = converter.colorProfiles.builtins.find(p => p.mixing);
+const converted = converter.convert({
+  data, width, height, palette: 'BWRY', dither: 'floyd', colorProfile: profile
+});
+```
+
+Source Lab values are retained in XYZ without an intermediate monitor-gamut clipping step. Relative normalization uses a shared affine black/white mapping. Mixtures and diffusion operate in empirical root-XYZ coordinates; exports remain nominal. The approximation is applied to fixed mixtures, ordered tiles and Floyd diffusion. Applying it to patterns or three-/four-color combinations not measured during the initial comparison is an extrapolation.
+
+For a preview, use `colorProfiles.calculation(profile, nominalColors).reflectance` with `converter.reflectance.preview(rgba, width, height, nominalColors, model, blurRadius)`. The function returns an independent RGBA array, preserves alpha, averages model coordinates before monitor encoding, and never modifies export pixels. `rgb` and `gamut` continuous AP preparation still ignore the model.
+
+See [COLOR-PROFILES.md](COLOR-PROFILES.md) for provenance, normalization and limitations. No external runtime libraries or network requests are required.

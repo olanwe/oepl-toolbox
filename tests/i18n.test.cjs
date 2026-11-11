@@ -18,3 +18,11 @@ test('all declarative HTML translation keys have English catalog entries',()=>{
  for(const match of html.matchAll(/data-i18n(?:-[a-z-]+)?="([^"]*)"/g)){const key=match[1].replace(/&quot;/g,'"').replace(/&#x27;/g,"'").replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');assert.ok(Object.hasOwn(catalog,key),'Missing English translation: '+key);count++;}
  assert.ok(count>150);
 });
+
+test('English translation keys are unique rather than silently overriding earlier entries',()=>{
+ const keys=new Set();
+ for(const line of english.split(/\r?\n/)){
+  const match=line.match(/^\s*("(?:[^"\\]|\\.)*")\s*:/);if(!match)continue;
+  const key=JSON.parse(match[1]);assert.ok(!keys.has(key),'Duplicate translation: '+key);keys.add(key);
+ }
+});

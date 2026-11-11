@@ -3,6 +3,7 @@
  'use strict';
  const engine=root.OEPLImage || (typeof module!=='undefined'?require('./image-converter.js'):null);
  const illustration=root.Illustration||(typeof module!=='undefined'?require('./illustration.js'):null);
+ const colorProfiles=root.ColorProfiles||(typeof module!=='undefined'?require('./color-profiles.js'):null);
  const modes={'none':'none','floyd':'floyd','floyd-steinberg':'floyd','ordered':'ordered','bayer':'ordered','fixed':'fixed','fixed-mix':'fixed','rgb':'rgb','gamut':'gamut'};
  function settings(options={}){
   let palette=options.palette??'BWRY';if(palette==='BWYR')palette='BWRY';
@@ -17,7 +18,10 @@
   if(!Number.isInteger(mixColors)||mixColors<1||mixColors>4)throw Error('mixColors: 1–4');
   const biases=options.biases??[];if(!Array.isArray(biases)||biases.length>colors.length||biases.some(v=>!Number.isFinite(v)||Math.abs(v)>100))throw Error('Invalid palette biases.');
   const background=options.background??null;if(background!==null&&(typeof background!=='string'||!/^#[0-9a-f]{6}$/i.test(background)))throw Error('background: null or #RRGGBB');
-  return {colors:[...colors],dither,strength,mixColors,...corrected,biases:[...biases],background,illustration:illustration.settings(options.illustration)};
+  let renderColors=options.renderColors,reflectance;
+  if(options.colorProfile!==undefined){if(renderColors!==undefined)throw Error('Choose colorProfile or renderColors.');const profile=colorProfiles.validate(options.colorProfile),calculation=colorProfiles.calculation(profile,colors);renderColors=calculation.renderColors;reflectance=calculation.reflectance;}
+  engine.renderPalette(colors,renderColors);
+  return {colors:[...colors],dither,strength,mixColors,...corrected,biases:[...biases],background,...(renderColors===undefined?{}:{renderColors:[...renderColors]}),...(reflectance?{reflectance}:{}),illustration:illustration.settings(options.illustration)};
  }
  function convert(options={}){
   const {width,height,data}=options;engine.dimensions(width,height);const config=settings(options);
@@ -29,5 +33,6 @@
   const output=engine.quantize(prepared.data,width,height,config.colors,config);
   return illustration.apply(output,prepared,config.colors,config.illustration);
  }
- const api={...engine,version:'1.1.0',illustration,settings,convert};root.OEPLImage=api;if(typeof module!=='undefined')module.exports=api;
+ const reflectance=root.Reflectance||(typeof module!=='undefined'?require('./reflectance.js'):null);
+ const api={...engine,version:'1.4.0',illustration,colorProfiles,reflectance,settings,convert};root.OEPLImage=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

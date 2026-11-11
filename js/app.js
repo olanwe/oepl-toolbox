@@ -19,7 +19,7 @@
   let apFileEntries = [], listedBase = '', listedDirectory = '', currentTemplate = null;
   const busy = new Set();
   let selectedMeta = null, selectedTag = null, connectedBase = '', selectionVersion = 0;
-  let allTags = [], biases = [], drag = null, forceNewCrop = false, mixPage=0, mixPaletteKey='';
+  let allTags = [], biases = [], drag = null, forceNewCrop = false, mixPage=0, mixPaletteKey='', colorProfileEditor=null;
   const defaults = {brightness: 0, contrast: 1, saturation: 1, threshold: 128, strength: 1};
   function message(text, error = false) { $('notice').textContent = text; $('notice').classList.toggle('error', error); Activity.update('image',text,error); }
   function readStore(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
@@ -38,6 +38,7 @@
   }
   const colors = () => $('palette').value.startsWith('custom:') ? presets[$('palette').value.slice(7)] : EP.palettes[$('palette').value];
   function paletteChanged() {
+    colorProfileEditor?.paletteChanged();
     populatePatternColors();drawing?.populate();
     const palette = colors(); biases = palette.map(() => 0);
     $('customColors').value = palette.join(', '); $('colors').replaceChildren(); $('biases').replaceChildren();
@@ -101,6 +102,7 @@
   const continuousOutput=()=>['rgb','gamut'].includes($('dither').value);
   function schedule() {
     const continuous=continuousOutput(),fixed=$('dither').value==='fixed';
+    colorProfileEditor?.continuous(continuous);
     $('fixedMixControls').hidden=!fixed;
     $('quantizedHint').hidden=continuous||fixed;$('continuousHint').hidden=!continuous;$('apDitherChoice').hidden=!continuous;
     $('strength').disabled=continuous||fixed||$('dither').value==='none';
@@ -172,7 +174,7 @@
   async function updateMethodGuide(){
     const version=++guideVersion;if(!$('methodGuide').open)return;
     const activity=Activity.begin('guide',t('Beispiele werden berechnet …'));
-    try{await Activity.nextPaint();if(version===guideVersion&&$('methodGuide').open)MethodGuide.render($('methodExamples'),colors(),t);}
+    try{await Activity.nextPaint();if(version===guideVersion&&$('methodGuide').open)MethodGuide.render($('methodExamples'),colors(),t,colorProfileEditor?.renderColors,colorProfileEditor?.previewColors,colorProfileEditor?.calculation.reflectance,colorProfileEditor?.previewReflectance);}
     catch(error){message(error.message,true);Activity.update('guide',error.message,true);}
     finally{Activity.end(activity,t('Beispiele aktualisiert.'));}
   }
@@ -217,7 +219,7 @@
       const enhanced=optimizedSource(rect,dw,dh);
       if(enhanced&&enhanced.options.smooth>0)ctx.drawImage(enhanced.canvas,dx,dy,dw,dh);else ctx.drawImage(image,rect.x,rect.y,rect.w,rect.h,dx,dy,dw,dh);
       const options = Object.fromEntries(Object.keys(defaults).map(id => [id, val(id)]));
-      displayResult = EP.quantize(ctx.getImageData(0, 0, w, h).data, w, h, colors(), {...options, dither: $('dither').value, mixColors:val('mixColors'), biases});
+      displayResult = EP.quantize(ctx.getImageData(0, 0, w, h).data, w, h, colors(), {...options, dither: $('dither').value, mixColors:val('mixColors'), biases, ...colorProfileEditor?.calculation});
       if(enhanced)displayResult=Illustration.apply(displayResult,Illustration.resizeMasks(enhanced.prepared,w,h,dx,dy,dw,dh),colors(),enhanced.options);
       if ($('invert').checked) displayResult = EP.invert(displayResult, colors());
     return {pixels:displayResult,nativeW,nativeH,viewRotation,w,h,dx,dy,dw,dh};
@@ -407,7 +409,7 @@
   for (const id of Object.keys(defaults)) $(id).oninput = () => { $(id + 'Value').value = $(id).value; schedule(); };
   $('resetAdjustments').onclick = () => { for (const [id, v] of Object.entries(defaults)) { $(id).value = v; $(id + 'Value').value = v; } $('dither').value = 'none'; $('invert').checked = false; optimizationPreset('off');paletteChanged(); };
   function paintTargetPreview(){
-    if(displayResult){targetPreview.paint(target.getContext('2d'),displayResult,val('targetBlur'));drawing?.decorate();}
+    if(displayResult){targetPreview.paint(target.getContext('2d'),ColorProfiles.preview(displayResult,colors(),colorProfileEditor?.previewColors,colorProfileEditor?.previewReflectance),val('targetBlur'));drawing?.decorate();}
   }
   function updateTargetBlur(){
     const amount=val('targetBlur');target.style.filter='none';target.style.imageRendering=amount>0?'auto':'pixelated';$('targetBlurValue').value=I18N.number(amount,2)+' px';paintTargetPreview();
@@ -654,12 +656,14 @@
     if (!validColors(palette)) throw Error(t('Die AP-Farbtabelle kann nicht als Palette übernommen werden.'));
     const black = palette.indexOf('#000000'); if (black > 1) { palette.splice(black, 1); palette.splice(1, 0, '#000000'); }
     presets['AP-Display'] = palette; populatePresets('custom:AP-Display');
+    if($('takeColorProfile').checked)colorProfileEditor.applyAP(selectedMeta,'ap:'+selectedBase()+':'+EPAP.mac(selectedTag.mac));
+    else colorProfileEditor.clearAP();
     $('width').value = selectedMeta.width; $('height').value = selectedMeta.height; aspectRatio = Number(selectedMeta.width) / Number(selectedMeta.height); $('size').value = 'custom'; schedule();
   }
   function updateTagInfo() {
     $('tagInfo').textContent = (selectedMeta.name || 'Display') + ' · ' + selectedMeta.width + ' × ' + selectedMeta.height + ' px · ' + Object.keys(selectedMeta.colortable || {}).length + t(' Farben') + (Number(selectedTag.rotate) || Number(selectedTag.invert) ? t(' · Achtung: Im AP sind zusätzliche Drehung oder Invertierung aktiv; diese können das ausgelieferte Bild erneut verändern.') : '');
   }
-  task('profile', () => { applyProfile(); message(t('Displaygröße und Farbpalette übernommen.')); });
+  task('profile', () => { applyProfile(); const profile=colorProfileEditor.current();message(t('Displaygröße und Farbpalette übernommen.')+($('takeColorProfile').checked?' '+(profile?t('Berechnung mit Farbprofil: {name}',{name:t(profile.name)}):t('Kein aktives Farbprofil; idealisierte Farben werden verwendet.')):'')); });
   async function rawData() { if (!selectedTag) throw Error(t('Bitte ein Display auswählen.')); const response = await EPAP.request(selectedBase(), '/current/' + EPAP.mac(selectedTag.mac) + '.raw'); return response.arrayBuffer(); }
   task('raw', async () => { const name = EPAP.mac(selectedTag.mac); download(new Blob([await rawData()], {type: 'application/octet-stream'}), name + '.raw'); });
   task('read', async () => {
@@ -695,8 +699,9 @@
   });
   knownOptions(); if (known[0]) $('apAddress').value = known[0];
   if (['http:', 'https:'].includes(location.protocol) && !['localhost', '127.0.0.1'].includes(location.hostname) && !known[0]) $('apAddress').value = location.origin;
+  colorProfileEditor=new ColorProfileEditor({colors,readStore,saveStore,message,download,t,onChange:()=>{updateMethodGuide();schedule();},onPreview:()=>{paintTargetPreview();updateMethodGuide();}});
   populatePresets();$('testPatternMode').onchange();
-  drawing=new DrawingEditor({target,colors,onChange:updateDrawing,message,blank:()=>{},preview:ctx=>{if(val('targetBlur')>0)targetPreview.paint(ctx,{data:ctx.getImageData(0,0,target.width,target.height).data,width:target.width,height:target.height},val('targetBlur'));}});
+  drawing=new DrawingEditor({target,colors,onChange:updateDrawing,message,blank:()=>{},quantizeOptions:()=>({...colorProfileEditor.calculation,exactNominal:true}),preview:ctx=>{const refs=continuousOutput()?undefined:colorProfileEditor.previewColors;if(!refs&&val('targetBlur')<=0)return;const pixels={data:ctx.getImageData(0,0,target.width,target.height).data,width:target.width,height:target.height,continuous:continuousOutput()};targetPreview.paint(ctx,ColorProfiles.preview(pixels,colors(),refs,colorProfileEditor.previewReflectance),val('targetBlur'));}});
   task('drawingBlank',()=>{
     const odd=val('viewRotation')%180,w=val(odd?'height':'width'),h=val(odd?'width':'height');EP.dimensions(w,h);
     const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h);

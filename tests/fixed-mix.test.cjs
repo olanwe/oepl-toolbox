@@ -7,3 +7,9 @@ test('fixed mode preserves exact palette entries including closely spaced custom
 test('fixed mode suppresses subtle within-level variations and exports valid VLW planes',()=>{const w=36,h=12,data=new Uint8ClampedArray(w*h*4);for(let y=0;y<h;y++)for(let x=0;x<w;x++)data.set([255,126+x%3,0,(x+y)%2?255:120],(y*w+x)*4);const out=EP.quantize(data,w,h,EP.palettes.BWRY,{dither:'fixed',mixColors:2});for(let y=0;y<h;y++)for(let x=0;x<w;x++){assert.equal(out.indices[y*w+x],(x+y)%2?3:2);assert.equal(out.data[(y*w+x)*4+3],data[(y*w+x)*4+3]);}const font=EP.vlw(out,EP.palettes.BWRY);assert.deepEqual(EP.readVlw(font.bytes,EP.palettes.BWRY).data,out.data);});
 test('custom palettes without white and collapsed mixture duplicates remain valid',()=>{const colors=['#ff0000','#00ff00','#808000'],f=setup(colors,4);assert.ok(f.candidates.length<=7);const out=EP.quantize(Uint8ClampedArray.of(128,128,0,255),1,1,colors,{dither:'fixed',mixColors:4});assert.equal(out.indices[0],2);assert.throws(()=>setup(colors,5));});
 
+test('duplicate profile references do not corrupt exact-color candidate indices',()=>{
+ const palette=[[0,0,0],[0,0,0],[255,255,255]],mix=F.prepare(palette,{maxColors:3,toLab:EP.rgbToLab});
+ assert.equal(mix.index(mix.choose([255,255,255]),0,0),2);
+ assert.equal(mix.index(mix.choose([0,0,0]),0,0),0);
+});
+

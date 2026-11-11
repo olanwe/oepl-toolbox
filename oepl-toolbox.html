@@ -731,14 +731,58 @@ main,footer { max-width:none; }
 @media(max-width:1200px){.methodExampleGrid{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media(max-width:480px){.methodExampleGrid{grid-template-columns:1fr;}}
 
+/* Separate output-color and physical-reference controls. */
+.colorProfileControls{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+#colorProfileInfo{overflow-wrap:anywhere}
+.colorProfileControls a{color:var(--green)}
+.colorProfileRow{display:flex;gap:8px;align-items:flex-end;margin:10px 0}
+.colorProfileRow label{flex:1;min-width:0;margin:0}
+.colorProfileRow input[type=text]{font-family:Consolas,monospace}
+.colorProfileRow input[type=color]{width:42px;height:40px;flex:0 0 42px;padding:3px;margin:0}
+
+.colorProfileRow{display:grid;grid-template-columns:minmax(0,1fr) 42px;align-items:end}
+.profileEffectiveColor{grid-column:1/-1;font-size:11px;color:var(--muted)}
+.profileEffectiveColor::before{content:"";display:inline-block;width:13px;height:13px;margin-right:6px;vertical-align:middle;background:var(--effective-color);border:1px solid var(--line);border-radius:3px}
+
+.panelReferenceComparison{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:8px}
+.panelReferenceComparison table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.panelReferenceComparison caption{text-align:left;font-weight:600;margin-bottom:8px}
+.panelReferenceComparison th{font-weight:600;text-align:left;padding:3px;overflow-wrap:anywhere}
+.panelReferenceComparison th:first-child{width:28px}
+.panelReferenceComparison td{padding:3px}
+.panelReferenceSwatch{display:block;border:1px solid var(--line);border-radius:4px;padding:8px 2px;text-align:center;font:11px Consolas,monospace}
+.panelReferenceComparison .hint{margin:8px 0 0;font-size:11px}
+
 </style></head>
 <body><header><a class="brand" href="#"><span class="mark">OT</span> OEPL-Toolbox <small>E-PAPER &amp; LED</small></a><div class="headerTools"><span class="badge"><span data-i18n="Lokale Verarbeitung im Browser">Lokale Verarbeitung im Browser</span></span><label class="themeLabel"><span data-i18n="Darstellung">Darstellung</span><select id="theme" aria-label="Darstellung" data-i18n-aria-label="Darstellung"><option value="auto" data-i18n="Automatisch">Automatisch</option><option value="light" data-i18n="Hell">Hell</option><option value="dark" data-i18n="Dunkel">Dunkel</option></select></label><label class="languageLabel"><span data-i18n="Sprache">Sprache</span><select id="language" aria-label="Sprache" data-i18n-aria-label="Sprache"><option value="de">Deutsch</option><option value="en">English</option></select></label></div></header><main><nav class="toolnav" aria-label="Werkzeuge" data-i18n-aria-label="Werkzeuge"><button id="imageTool" class="active" aria-pressed="true"><span data-i18n="Bildstudio">Bildstudio</span></button><button id="ledTool" aria-pressed="false"><span data-i18n="LED-Designer">LED-Designer</span></button></nav>
 <div class="intro"><div><p class="eyebrow"><span data-i18n="BILDBEARBEITUNG">BILDBEARBEITUNG</span></p><h1><span data-i18n="Bilder für E-Paper-Displays">Bilder für E-Paper-Displays</span></h1><p><span data-i18n="Bilder zuschneiden, skalieren, Farben zuordnen und an OpenEPaperLink übertragen.">Bilder zuschneiden, skalieren, Farben zuordnen und an OpenEPaperLink übertragen.</span></p></div><div class="sourceInputs"><label class="upload"><span data-i18n="＋ Bild oder VLW öffnen">＋ Bild oder VLW öffnen</span><input id="file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/gif,.vlw,.gz,application/gzip"></label><button id="pasteSource" type="button" title="Als Quellbild einfügen" data-i18n-title="Als Quellbild einfügen"><span data-i18n="Bild aus Zwischenablage">Bild aus Zwischenablage</span></button></div></div>
 <div id="notice" role="status" aria-live="polite"><span data-i18n="Bilddatei öffnen oder Beispiel laden.">Bilddatei öffnen oder Beispiel laden.</span></div>
 <div class="workspace"><aside id="settings">
-<section><h2><span>01</span> <span data-i18n="Display &amp; Farben">Display &amp; Farben</span></h2><label><span data-i18n="Farbpalette">Farbpalette</span><select id="palette"></select></label><div id="colors"></div><details><summary data-i18n="Farblegende">Farblegende</summary><p id="colorLegend" class="hint"></p></details>
+<section><h2><span>01</span> <span data-i18n="Display &amp; Farben">Display &amp; Farben</span></h2><label><span data-i18n="Farbpalette">Farbpalette</span><select id="palette"></select></label><div id="colors"></div>
+<div class="colorProfileControls">
+<label><span data-i18n="Farbprofil für die Berechnung">Farbprofil für die Berechnung</span><select id="colorProfile"></select></label>
+<p class="hint" data-i18n="Ein Farbprofil berücksichtigt die tatsächlichen Pigmentfarben des Displays. Das Displaygelb kann zum Beispiel dunkler und rötlicher sein als reines Gelb auf einem Vollfarbbildschirm. Der Konverter berücksichtigt das bei der Berechnung der Farbmischungen.">Ein Farbprofil berücksichtigt die tatsächlichen Pigmentfarben des Displays. Das Displaygelb kann zum Beispiel dunkler und rötlicher sein als reines Gelb auf einem Vollfarbbildschirm. Der Konverter berücksichtigt das bei der Berechnung der Farbmischungen.</p>
+<p id="colorProfileInfo" class="hint"></p>
+<div id="panelReferenceComparison" class="panelReferenceComparison" hidden></div>
+
+<p class="hint" data-i18n="Das Profil steuert Farbzuordnung, Dithering und feste Mischfarben. Export und Versand verwenden weiterhin die ursprünglichen Displayfarben.">Das Profil steuert Farbzuordnung, Dithering und feste Mischfarben. Export und Versand verwenden weiterhin die ursprünglichen Displayfarben.</p>
+<p id="profileContinuousHint" class="hint" hidden data-i18n="Bei erhaltenen Farbstufen wird das Farbprofil nicht angewendet; die endgültige Quantisierung übernimmt der AP.">Bei erhaltenen Farbstufen wird das Farbprofil nicht angewendet; die endgültige Quantisierung übernimmt der AP.</p>
+<details id="colorProfileEditor"><summary data-i18n="Farbprofil bearbeiten / eigenes Profil speichern">Farbprofil bearbeiten / eigenes Profil speichern</summary>
+<label><span data-i18n="Profilhelligkeit">Profilhelligkeit</span><select id="profileNormalization"><option value="relative" data-i18n="Relativ normalisiert">Relativ normalisiert</option><option value="raw" data-i18n="Unnormalisierte Referenzwerte">Unnormalisierte Referenzwerte</option></select></label>
+<p id="normalizationInfo" class="hint"></p>
+<p id="profileWhitePointHint" class="hint" hidden data-i18n="Hersteller-Näherung: D65-Bezugsweiß angenommen. Keine bestätigte Kalibrierung des gewählten Panels.">Hersteller-Näherung: D65-Bezugsweiß angenommen. Keine bestätigte Kalibrierung des gewählten Panels.</p>
+<p class="hint" data-i18n="Für die Bildkonvertierung relativ normalisiert lassen. Unnormalisierte Werte dienen vor allem Mess- und Modellvergleichen.">Für die Bildkonvertierung relativ normalisiert lassen. Unnormalisierte Werte dienen vor allem Mess- und Modellvergleichen.</p>
+<p class="hint" data-i18n="Profilfarben für jede Displayfarbe festlegen. Die Eingabefelder bleiben unnormalisierte Referenzwerte. Änderungen werden erst mit Speichern übernommen. Herstellerdaten und Näherungen sind keine Kalibrierung des eigenen Panels.">Profilfarben für jede Displayfarbe festlegen. Änderungen werden erst mit Speichern übernommen. Herstellerdaten und Näherungen sind keine Kalibrierung des eigenen Panels.</p>
+<div id="colorProfileRows"></div><label><span data-i18n="Mischungsmodell">Mischungsmodell</span><select id="colorProfileModel"><option value="legacy" data-i18n="Bisherige RGB-Berechnung">Bisherige RGB-Berechnung</option><option value="power-xyz" data-i18n="Reflexionsmodell für feine Raster">Reflexionsmodell für feine Raster</option></select></label><label><span data-i18n="Rasterexponent (1 = linear)">Rasterexponent (1 = linear)</span><input id="colorProfileExponent" type="number" min="1" max="3" step="0.05" value="1.8"></label><p class="hint" data-i18n="Näherung für feine Raster; größere Werte berücksichtigen stärkere Abdunklung. Für grobe Muster und andere Panels nicht kalibriert. Änderungen mit Speichern übernehmen.">Näherung für feine Raster; größere Werte berücksichtigen stärkere Abdunklung. Für grobe Muster und andere Panels nicht kalibriert. Änderungen mit Speichern übernehmen.</p>
+<label><span data-i18n="Profilname">Profilname</span><input id="colorProfileName" maxlength="80"></label>
+<label><span data-i18n="Herkunft / Messbedingungen">Herkunft / Messbedingungen</span><input id="colorProfileSource" maxlength="600"></label>
+<label><span data-i18n="Datengrundlage">Datengrundlage</span><select id="colorProfileKind"><option value="approximate" data-i18n="Näherung">Näherung</option><option value="measured" data-i18n="Eigene Messung">Eigene Messung</option><option value="manufacturer" data-i18n="Herstellerangabe">Herstellerangabe</option></select></label>
+<div class="row wrap"><button id="saveColorProfile" data-i18n="Farbprofil speichern und anwenden">Farbprofil speichern und anwenden</button><button id="deleteColorProfile" disabled data-i18n="Eigenes Farbprofil löschen">Eigenes Farbprofil löschen</button><button id="exportColorProfile" data-i18n="Farbprofil als JSON speichern">Farbprofil als JSON speichern</button></div>
+<label><span data-i18n="Farbprofil importieren (JSON)">Farbprofil importieren (JSON)</span><input id="importColorProfile" type="file" accept="application/json,.json"></label>
+</details></div>
+<details><summary data-i18n="Farblegende">Farblegende</summary><p id="colorLegend" class="hint"></p></details>
 <details><summary><span data-i18n="Eigene Farbpresets">Eigene Farbpresets</span></summary><p class="hint"><span data-i18n="2–16 unterschiedliche Hex-Farben mit Komma trennen. Reihenfolge frei; Weiß ist optional.">2–16 unterschiedliche Hex-Farben mit Komma trennen. Reihenfolge frei; Weiß ist optional.</span></p><label><span data-i18n="Farben">Farben</span><input id="customColors" value="#ffffff, #000000, #ff0000, #ffff00"></label><label><span data-i18n="Preset-Name">Preset-Name</span><input id="presetName" placeholder="Name des Farbpresets" maxlength="60" data-i18n-placeholder="Name des Farbpresets"></label><div class="row"><button id="savePreset"><span data-i18n="Speichern">Speichern</span></button><button id="deletePreset"><span data-i18n="Preset löschen">Preset löschen</span></button></div></details>
-<label><span data-i18n="Displaygröße">Displaygröße</span><select id="size"><option value="custom" data-i18n="Eigene Abmessungen">Eigene Abmessungen</option><option value="152x152" data-i18n="1,54″ · 152 × 152">1,54″ · 152 × 152</option><option value="200x200" data-i18n="1,54″ · 200 × 200">1,54″ · 200 × 200</option><option value="250x122" data-i18n="2,13″ · 250 × 122">2,13″ · 250 × 122</option><option value="296x128" selected data-i18n="2,9″ · 296 × 128">2,9″ · 296 × 128</option><option value="400x300" data-i18n="4,2″ · 400 × 300">4,2″ · 400 × 300</option><option value="600x448" data-i18n="5,65″ · 600 × 448">5,65″ · 600 × 448</option><option value="648x480" data-i18n="5,83″ · 648 × 480">5,83″ · 648 × 480</option><option value="800x480" data-i18n="7,5″ · 800 × 480">7,5″ · 800 × 480</option><option value="960x640" data-i18n="9,7″ · 960 × 640">9,7″ · 960 × 640</option></select></label>
+<label><span data-i18n="Displaygröße">Displaygröße</span><select id="size"><option value="custom" data-i18n="Eigene Abmessungen">Eigene Abmessungen</option><option value="152x152" data-i18n="1,54″ · 152 × 152">1,54″ · 152 × 152</option><option value="200x200" data-i18n="1,54″ · 200 × 200">1,54″ · 200 × 200</option><option value="250x122" data-i18n="2,13″ · 250 × 122">2,13″ · 250 × 122</option><option value="296x128" selected data-i18n="2,9″ · 296 × 128">2,9″ · 296 × 128</option><option value="384x168" data-i18n="2,9″ · M3 · 384 × 168">2,9″ · M3 · 384 × 168</option><option value="400x300" data-i18n="4,2″ · 400 × 300">4,2″ · 400 × 300</option><option value="600x448" data-i18n="5,65″ · 600 × 448">5,65″ · 600 × 448</option><option value="648x480" data-i18n="5,83″ · 648 × 480">5,83″ · 648 × 480</option><option value="800x480" data-i18n="7,5″ · 800 × 480">7,5″ · 800 × 480</option><option value="960x640" data-i18n="9,7″ · 960 × 640">9,7″ · 960 × 640</option></select></label>
 <div class="row"><label><span data-i18n="Breite">Breite</span><input id="width" type="number" min="1" max="4096" value="296"></label><button id="swap" aria-label="Breite und Höhe tauschen" data-i18n-aria-label="Breite und Höhe tauschen">⇄</button><label><span data-i18n="Höhe">Höhe</span><input id="height" type="number" min="1" max="4096" value="128"></label></div><label class="check"><input id="aspect" type="checkbox"> <span data-i18n="Seitenverhältnis beim Ändern halten">Seitenverhältnis beim Ändern halten</span></label><label><span data-i18n="Ausgabedisplay drehen">Ausgabedisplay drehen</span><select id="viewRotation"><option value="0" data-i18n="0° · Original">0° · Original</option><option value="90" data-i18n="90° · nach rechts">90° · nach rechts</option><option value="180" data-i18n="180° · gedreht">180° · gedreht</option><option value="270" data-i18n="270° · nach links">270° · nach links</option></select></label><p class="hint"><span data-i18n="Dreht die Zielansicht. Quelle und Ausschnitt bleiben unverändert. Die Übertragung erfolgt im originalen Displayformat.">Dreht die Zielansicht. Quelle und Ausschnitt bleiben unverändert. Die Übertragung erfolgt im originalen Displayformat.</span></p></section>
 <section><h2><span>02</span> <span data-i18n="Ausschnitt &amp; Skalierung">Ausschnitt &amp; Skalierung</span></h2><label class="check"><input id="transparent" type="checkbox" checked> <span data-i18n="Transparenz erhalten">Transparenz erhalten</span></label><label><span data-i18n="Einpassen">Einpassen</span><select id="fit"><option value="free" data-i18n="Frei skalieren und positionieren">Frei skalieren und positionieren</option><option value="native" data-i18n="1:1 · ohne Skalierung">1:1 · ohne Skalierung</option><option value="contain" selected data-i18n="Vollständig · mit Rändern">Vollständig · mit Rändern</option><option value="cover" data-i18n="Fläche füllen · mittig beschneiden">Fläche füllen · mittig beschneiden</option><option value="stretch" data-i18n="Auf Zielgröße strecken">Auf Zielgröße strecken</option></select></label><p class="hint" data-i18n="1:1 erhält die Pixelgröße. Mit freier Skalierung lässt sich die Größe in Prozent ändern. In beiden Modi kann das Bild in der Zielvorschau gezogen werden. Überstehende Teile werden abgeschnitten; Displaygröße und Farbkonvertierung bleiben erhalten.">1:1 erhält die Pixelgröße. Mit freier Skalierung lässt sich die Größe in Prozent ändern. In beiden Modi kann das Bild in der Zielvorschau gezogen werden. Überstehende Teile werden abgeschnitten; Displaygröße und Farbkonvertierung bleiben erhalten.</p><div id="placementControls" hidden><label><span data-i18n="Bildskalierung">Bildskalierung</span><output id="imageScaleValue">100 %</output><input id="imageScale" type="range" min="1" max="400" value="100" step="1"></label><div class="row"><label><span data-i18n="Versatz X (px)">Versatz X (px)</span><input id="offsetX" type="number" min="-4096" max="4096" step="1" value="0"></label><label><span data-i18n="Versatz Y (px)">Versatz Y (px)</span><input id="offsetY" type="number" min="-4096" max="4096" step="1" value="0"></label></div><button id="centerImage" data-i18n="Bild zentrieren">Bild zentrieren</button><p class="hint" data-i18n="Versatz relativ zur Mitte. Der Prozentregler wechselt zur freien Skalierung. Der Ansichtszoom verändert nur die Vorschau.">Versatz relativ zur Mitte. Der Prozentregler wechselt zur freien Skalierung. Der Ansichtszoom verändert nur die Vorschau.</p></div><div class="row"><label><span data-i18n="Quellbild drehen">Quellbild drehen</span><select id="rotation"><option value="0">0°</option><option value="90">90°</option><option value="180">180°</option><option value="270">270°</option></select></label><label><span data-i18n="Interpolation">Interpolation</span><select id="smooth"><option value="yes" data-i18n="Glatt">Glatt</option><option value="no" data-i18n="Pixelgenau">Pixelgenau</option></select></label></div>
 <label class="check"><input id="cropMode" type="checkbox"> <span data-i18n="Ausschnitt im Quellbild markieren">Ausschnitt im Quellbild markieren</span></label><label class="check"><input id="cropAspect" type="checkbox"> <span data-i18n="Ausschnitt an Display-Seitenverhältnis binden">Ausschnitt an Display-Seitenverhältnis binden</span></label><button id="newCrop" type="button" aria-pressed="false"><span data-i18n="Neuen Ausschnitt markieren">Neuen Ausschnitt markieren</span></button><p class="hint"><span data-i18n="Zum Bearbeiten die Ausschnittauswahl aktivieren: innen ziehen zum Verschieben, Ziehpunkte zum Vergrößern oder Verkleinern. Die Bindung berücksichtigt die Displayausrichtung.">Zum Bearbeiten die Ausschnittauswahl aktivieren: innen ziehen zum Verschieben, Ziehpunkte zum Vergrößern oder Verkleinern. Die Bindung berücksichtigt die Displayausrichtung.</span></p><div class="cropgrid"><label>X<input id="cropX" type="number" step="any" min="0" value="0"></label><label>Y<input id="cropY" type="number" step="any" min="0" value="0"></label><label><span data-i18n="Breite">Breite</span><input id="cropW" type="number" step="any" min="1" value="1"></label><label><span data-i18n="Höhe">Höhe</span><input id="cropH" type="number" step="any" min="1" value="1"></label></div><div class="row"><button id="resetCrop"><span data-i18n="Ausschnitt zurücksetzen">Ausschnitt zurücksetzen</span></button><button id="originalSize" title="Setzt die Zielgröße auf die Pixelmaße des Quellausschnitts und die Ansicht auf „Einpassen“. Die Displayabmessungen werden dabei geändert." data-i18n-title="Setzt die Zielgröße auf die Pixelmaße des Quellausschnitts und die Ansicht auf „Einpassen“. Die Displayabmessungen werden dabei geändert."><span data-i18n="Ausschnittgröße (1:1)">Ausschnittgröße (1:1)</span></button></div></section>
@@ -746,10 +790,10 @@ main,footer { max-width:none; }
 <label class="check"><input id="invert" type="checkbox"> <span data-i18n="Schwarz und Weiß invertieren">Schwarz und Weiß invertieren</span></label><p class="hint"><span data-i18n="Akzentfarben und Transparenz bleiben erhalten.">Akzentfarben und Transparenz bleiben erhalten.</span></p><label><span data-i18n="Helligkeit">Helligkeit</span> <output id="brightnessValue">0</output><input id="brightness" type="range" min="-128" max="128" value="0"></label><label><span data-i18n="Kontrast">Kontrast</span> <output id="contrastValue">1</output><input id="contrast" type="range" min="0.2" max="3" step="0.05" value="1"></label><label><span data-i18n="Sättigung">Sättigung</span> <output id="saturationValue">1</output><input id="saturation" type="range" min="0" max="2" step="0.05" value="1"></label><label><span data-i18n="Hell-Dunkel-Schwelle">Hell-Dunkel-Schwelle</span> <output id="thresholdValue">128</output><input id="threshold" type="range" min="1" max="254" value="128"></label>
 <details><summary><span data-i18n="Einzelne Farben bevorzugen">Einzelne Farben bevorzugen</span></summary><p class="hint"><span data-i18n="Positive Werte vergrößern den Zuordnungsbereich der Farbe, negative verkleinern ihn.">Positive Werte vergrößern den Zuordnungsbereich der Farbe, negative verkleinern ihn.</span></p><div id="biases"></div></details><label><span data-i18n="Farbausgabe">Farbausgabe</span><select id="dither"><option value="rgb" data-i18n="Farbstufen erhalten · RGB">Farbstufen erhalten · RGB</option><option value="gamut" data-i18n="Farbstufen erhalten · Palettenfarbraum">Farbstufen erhalten · Palettenfarbraum</option><option value="fixed" data-i18n="Farbflächen · feste Mischfarben">Farbflächen · feste Mischfarben</option><option value="none" selected data-i18n="Ohne · klare Flächen &amp; Text">Ohne · klare Flächen & Text</option><option value="floyd" data-i18n="Floyd–Steinberg · Fotos">Floyd–Steinberg · Fotos</option><option value="ordered" data-i18n="Bayer 4 × 4 · regelmäßiges Raster">Bayer 4 × 4 · regelmäßiges Raster</option></select></label><div id="fixedMixControls" hidden><label><span data-i18n="Displayfarben pro Mischton (höchstens)">Displayfarben pro Mischton (höchstens)</span><select id="mixColors"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select></label><p class="hint" data-i18n="Reine Farben und gleichmäßige Mischungen bis zur gewählten Anzahl. Jeder Mischton erhält ein festes 1-Pixel-Muster, ohne Zwischenverhältnisse oder Fehlerdiffusion. Kleine Farbschwankungen innerhalb derselben Stufe ändern das Muster nicht. Der Verlauf wird stufig; vorhandenes Bildrauschen kann weiterhin Stufenwechsel verursachen.">Reine Farben und gleichmäßige Mischungen bis zur gewählten Anzahl. Jeder Mischton erhält ein festes 1-Pixel-Muster, ohne Zwischenverhältnisse oder Fehlerdiffusion. Kleine Farbschwankungen innerhalb derselben Stufe ändern das Muster nicht. Der Verlauf wird stufig; vorhandenes Bildrauschen kann weiterhin Stufenwechsel verursachen.</p></div><p id="continuousHint" class="hint" hidden><span data-i18n="Farbstufen bleiben ohne Raster erhalten. RGB übernimmt alle Farben; Palettenfarbraum begrenzt sie auf darstellbare Mischfarben der Palette. Farbkorrekturen bleiben aktiv, Einzel-Farbgewichtung und Dither-Stärke entfallen. Invertieren kehrt alle RGB-Kanäle um. PNG/JPEG speichern diese Vorbereitung; die endgültige Darstellung bestimmt der AP. VLW ist hier nicht verfügbar.">Farbstufen bleiben ohne Raster erhalten. RGB übernimmt alle Farben; Palettenfarbraum begrenzt sie auf darstellbare Mischfarben der Palette. Farbkorrekturen bleiben aktiv, Einzel-Farbgewichtung und Dither-Stärke entfallen. Invertieren kehrt alle RGB-Kanäle um. PNG/JPEG speichern diese Vorbereitung; die endgültige Darstellung bestimmt der AP. VLW ist hier nicht verfügbar.</span></p><label id="apDitherChoice" hidden><span data-i18n="Dithering beim Direktversand (AP)">Dithering beim Direktversand (AP)</span><select id="apDither"><option value="0" data-i18n="Ohne">Ohne</option><option value="1" selected>Floyd–Steinberg</option><option value="2" data-i18n="Geordnetes Raster">Geordnetes Raster</option></select></label><p id="quantizedHint" class="hint"><span data-i18n="Wahrnehmungsorientierte Farbzuordnung bei jeder Stärke. Weniger Stärke reduziert das Raster in Richtung „Ohne“; Bayer 4×4 kann dabei sichtbare Stufen zeigen.">Wahrnehmungsorientierte Farbzuordnung bei jeder Stärke. Weniger Stärke reduziert das Raster in Richtung „Ohne“; Bayer 4×4 kann dabei sichtbare Stufen zeigen.</span></p><label><span data-i18n="Dither-Stärke">Dither-Stärke</span> <output id="strengthValue">1</output><input id="strength" type="range" min="0" max="1" step="0.05" value="1"></label><button id="resetAdjustments"><span data-i18n="Farbregler zurücksetzen">Farbregler zurücksetzen</span></button></section><section id="illustrationPanel"><h2 data-i18n="Linien und Schrift optimieren">Linien und Schrift optimieren</h2><label><span data-i18n="Optimierungspreset">Optimierungspreset</span><select id="optPreset"><option value="off" data-i18n="Aus">Aus</option><option value="comic" data-i18n="Comic">Comic</option><option value="diagram" data-i18n="Diagramm">Diagramm</option><option value="text" data-i18n="Nur Text verbessern">Nur Text verbessern</option><option value="custom" data-i18n="Eigene Einstellungen">Eigene Einstellungen</option></select></label><div class="optimizationControl"><label class="check"><input id="optDark" type="checkbox"><span data-i18n="Dunkle Konturen schützen">Dunkle Konturen schützen</span></label><label><span data-i18n="Stärke">Stärke</span> <output id="optDarkStrengthValue">50 %</output><input id="optDarkStrength" type="range" min="0" max="100" step="1" value="50" disabled></label></div><div class="optimizationControl"><label class="check"><input id="optColor" type="checkbox"><span data-i18n="Farbige dünne Linien schützen">Farbige dünne Linien schützen</span></label><label><span data-i18n="Stärke">Stärke</span> <output id="optColorStrengthValue">50 %</output><input id="optColorStrength" type="range" min="0" max="100" step="1" value="50" disabled></label></div><div class="optimizationControl"><label class="check"><input id="optText" type="checkbox"><span data-i18n="Schrift auf hellem Hintergrund schützen">Schrift auf hellem Hintergrund schützen</span></label><label><span data-i18n="Stärke">Stärke</span> <output id="optTextStrengthValue">50 %</output><input id="optTextStrength" type="range" min="0" max="100" step="1" value="50" disabled></label></div><div class="optimizationControl"><label class="check"><input id="optSmooth" type="checkbox"><span data-i18n="Farbflächen beruhigen">Farbflächen beruhigen</span></label><label><span data-i18n="Stärke">Stärke</span> <output id="optSmoothStrengthValue">50 %</output><input id="optSmoothStrength" type="range" min="0" max="100" step="1" value="50" disabled></label></div><p class="hint" data-i18n="Wirkt auf das Quellbild vor der Zeichenebene. Die reguläre Vorschau zeigt das Ergebnis. Hohe Stärken können kleine Buchstaben schließen oder Linien verdicken. Farbige Linien werden nur bei passender Displayfarbe gezielt geschützt; helle Textflächen werden automatisch angenähert.">Wirkt auf das Quellbild vor der Zeichenebene. Die reguläre Vorschau zeigt das Ergebnis. Hohe Stärken können kleine Buchstaben schließen oder Linien verdicken. Farbige Linien werden nur bei passender Displayfarbe gezielt geschützt; helle Textflächen werden automatisch angenähert.</p><button id="optReset" data-i18n="Optimierungen ausschalten">Optimierungen ausschalten</button></section></aside>
 <div class="stage"><section class="previewPanel"><div class="paneltop"><h2><span data-i18n="Quelle und Ausgabe">Quelle und Ausgabe</span></h2></div>
-<div class="previewWorkspaceTools"><label><span data-i18n="Maus / Touch">Maus / Touch</span><select id="previewInteraction"><option value="auto" data-i18n="Automatisch">Automatisch</option><option value="pan" data-i18n="Ansicht verschieben">Ansicht verschieben</option></select></label><label><span data-i18n="Bildbereich (% Fensterhöhe)">Bildbereich (% Fensterhöhe)</span><output id="previewHeightValue">55 %</output><input id="previewHeight" type="range" min="25" max="85" step="5" value="55"></label><button id="expandWorkspace" type="button" aria-pressed="false" data-i18n="Arbeitsansicht vergrößern">Arbeitsansicht vergrößern</button></div><p class="hint navigationHint" data-i18n="Ansicht: ziehen zum Verschieben, Strg + Mausrad zum Zoomen; Mitteltaste oder Leertaste + Ziehen auch beim Zeichnen. Touch: zwei Finger zum Verschieben und Zoomen. Ausschnittwahl, Zeichenwerkzeuge und Bildpositionierung haben im Automatikmodus Vorrang. Nur Anzeige; kein Einfluss auf Export.">Ansicht: ziehen zum Verschieben, Strg + Mausrad zum Zoomen; Mitteltaste oder Leertaste + Ziehen auch beim Zeichnen. Touch: zwei Finger zum Verschieben und Zoomen. Ausschnittwahl, Zeichenwerkzeuge und Bildpositionierung haben im Automatikmodus Vorrang. Nur Anzeige; kein Einfluss auf Export.</p><details id="methodGuide" class="testPatternControls"><summary data-i18n="Dithering und Optimierungen · Beispiele">Dithering und Optimierungen · Beispiele</summary><p class="hint" data-i18n="Eingebaute Beispielgrafik mit der aktuellen Palette. Vergleich bei voller Dither-Stärke; feste Mischfarben mit höchstens zwei Farben. Die Beispielbilder zeigen nicht die aktuellen Bildkorrekturen. RGB und Palettenfarbraum sind Vorbereitungen, keine fertige Displayausgabe.">Eingebaute Beispielgrafik mit der aktuellen Palette. Vergleich bei voller Dither-Stärke; feste Mischfarben mit höchstens zwei Farben. Die Beispielbilder zeigen nicht die aktuellen Bildkorrekturen. RGB und Palettenfarbraum sind Vorbereitungen, keine fertige Displayausgabe.</p><div id="methodExamples"></div></details><details id="testPatternPanel" class="testPatternControls"><summary data-i18n="Test- und Beispielbilder">Test- und Beispielbilder</summary><div class="row wrap"><label><span data-i18n="Testbild-Bereich">Testbild-Bereich</span><select id="testPatternMode"><option value="noise" data-i18n="Farbrauschen (Vollbild)">Farbrauschen (Vollbild)</option><option value="solid" data-i18n="Vollfarbe (Vollbild)">Vollfarbe (Vollbild)</option><option value="checker" data-i18n="Schachbrett (Vollbild)">Schachbrett (Vollbild)</option><option value="all" selected data-i18n="Gesamtes Testbild">Gesamtes Testbild</option><option value="colors" data-i18n="Farbflächen">Farbflächen</option><option value="lines" data-i18n="Linienauflösung">Linienauflösung</option><option value="pairs" data-i18n="Farbmischungen">Farbmischungen</option><option value="gradients" data-i18n="Farbverläufe">Farbverläufe</option></select></label><button id="testPattern"><span data-i18n="Testbild erzeugen">Testbild erzeugen</span></button><button id="demo"><span data-i18n="Beispiel laden">Beispiel laden</span></button></div><div id="patternOptions" hidden><div class="row"><label id="patternLabelsControl"><span data-i18n="Testbild-Beschriftung">Testbild-Beschriftung</span><select id="patternLabels"><option value="auto" data-i18n="Automatisch nach Displaygröße">Automatisch nach Displaygröße</option><option value="on" data-i18n="Alle Bezeichnungen">Alle Bezeichnungen</option><option value="off" data-i18n="Nur Auflösung">Nur Auflösung</option></select></label><label id="patternSeedControl" hidden><span data-i18n="Rausch-Startwert">Rausch-Startwert</span><input id="patternSeed" type="number" min="0" max="4294967295" step="1" value="1"><button id="newPatternSeed" data-i18n="Neuer Startwert">Neuer Startwert</button></label><label id="patternFirstColor"><span data-i18n="Testfarbe">Testfarbe</span><select id="patternColorA"></select></label><label id="patternSecondColor"><span data-i18n="Zweite Testfarbe">Zweite Testfarbe</span><select id="patternColorB"></select></label><label id="patternCellControl"><span data-i18n="Schachbrett-Feldgröße (px)">Schachbrett-Feldgröße (px)</span><output id="patternCellValue">1</output><input id="patternCell" type="range" min="1" max="64" step="1" value="1"></label></div><div id="patternMixControls" hidden><div class="row wrap"><label><span data-i18n="Anzahl Mischfarben">Anzahl Mischfarben</span><select id="patternMixSize"></select></label><button id="patternMixPrevious" data-i18n="Vorherige Seite">Vorherige Seite</button><label><span data-i18n="Mischungsseite">Mischungsseite</span><input id="patternMixPage" type="number" min="1" step="1" value="1"></label><button id="patternMixNext" data-i18n="Nächste Seite">Nächste Seite</button></div><p id="patternMixInfo" class="hint"></p><details><summary data-i18n="Mischfeld-Legende">Mischfeld-Legende</summary><p id="patternMixLegend" class="hint"></p></details><p class="hint" data-i18n="Gleiche Anteile je Farbe, maximal zwölf Felder pro Seite. Das allgemeine Testbild enthält weiterhin nur Zweiermischungen.">Gleiche Anteile je Farbe, maximal zwölf Felder pro Seite. Das allgemeine Testbild enthält weiterhin nur Zweiermischungen.</p></div><p id="noiseHint" class="hint" hidden data-i18n="Farbrauschen verwendet die aktuelle Palette. Gleicher Startwert erzeugt dasselbe Muster. Für große, schlecht komprimierbare Testdateien; die Funkdatenmenge hängt von AP und Display ab.">Farbrauschen verwendet die aktuelle Palette. Gleicher Startwert erzeugt dasselbe Muster. Für große, schlecht komprimierbare Testdateien; die Funkdatenmenge hängt von AP und Display ab.</p></div></details><details id="drawingPanel" class="drawingControls"><summary data-i18n="Zeichenebene">Zeichenebene</summary><div class="row wrap"><label class="check"><input id="drawingEnabled" type="checkbox"><span data-i18n="Auf Zielbild zeichnen">Auf Zielbild zeichnen</span></label><label class="check"><input id="drawingVisible" type="checkbox" checked><span data-i18n="Zeichenebene anzeigen">Zeichenebene anzeigen</span></label><button id="drawingBlank" data-i18n="Leere Zeichenfläche">Leere Zeichenfläche</button></div><div class="row wrap"><label><span data-i18n="Zeichenwerkzeug">Zeichenwerkzeug</span><select id="drawingTool"><option value="select" data-i18n="Auswählen / Bearbeiten">Auswählen / Bearbeiten</option><option value="line" selected data-i18n="Linie">Linie</option><option value="rectangle" data-i18n="Rechteck">Rechteck</option><option value="square" data-i18n="Quadrat">Quadrat</option><option value="ellipse" data-i18n="Ellipse">Ellipse</option><option value="circle" data-i18n="Kreis">Kreis</option><option value="text" data-i18n="Text">Text</option><option value="eraser" data-i18n="Radierer">Radierer</option><option value="image" data-i18n="Bild einfügen">Bild einfügen</option></select></label><label><span data-i18n="Zeichenfarbe">Zeichenfarbe</span> <span id="drawingColorSwatch" class="drawingColorSwatch" aria-hidden="true"></span><select id="drawingColor"></select></label><label><span data-i18n="Strich / Radierer (px)">Strich / Radierer (px)</span><output id="drawingWidthValue">1</output><input id="drawingWidth" type="range" min="1" max="64" step="1" value="1"></label><label class="check"><input id="drawingAspect" type="checkbox"><span data-i18n="Seitenverhältnis halten (Shift)">Seitenverhältnis halten (Shift)</span></label><label class="check"><input id="drawingFill" type="checkbox"><span data-i18n="Form ausfüllen">Form ausfüllen</span></label></div><div class="row wrap"><label><span data-i18n="Vorhandenes Element">Vorhandenes Element</span><select id="drawingObjects"></select></label><button id="drawingDelete" disabled data-i18n="Element entfernen">Element entfernen</button></div><div id="drawingTextOptions" hidden><label><span data-i18n="Schriftart">Schriftart</span><select id="drawingFont"><option value="sans" data-i18n="Standard · ohne Serifen">Standard · ohne Serifen</option><option value="serif" data-i18n="Standard · mit Serifen">Standard · mit Serifen</option><option value="mono" data-i18n="Standard · Festbreite">Standard · Festbreite</option><option value="arial">Arial</option><option value="verdana">Verdana</option><option value="trebuchet">Trebuchet MS</option><option value="georgia">Georgia</option><option value="times">Times New Roman</option><option value="courier">Courier New</option></select></label><p class="hint" data-i18n="Verwendet lokal verfügbare Schriften. Fehlt eine Schrift, verwendet der Browser eine passende Ersatzschrift. Texte werden als Bild exportiert; der AP benötigt die Schrift nicht.">Verwendet lokal verfügbare Schriften. Fehlt eine Schrift, verwendet der Browser eine passende Ersatzschrift. Texte werden als Bild exportiert; der AP benötigt die Schrift nicht.</p><label><span data-i18n="Textinhalt">Textinhalt</span><textarea id="drawingText" rows="2" maxlength="1000">Text</textarea></label><div class="row"><label><span data-i18n="Schriftgröße (px)">Schriftgröße (px)</span><output id="drawingSizeValue">16</output><input id="drawingSize" type="range" min="8" max="160" step="1" value="16"></label><label class="check"><input id="drawingBold" type="checkbox" checked><span data-i18n="Fettschrift">Fettschrift</span></label></div></div><div id="drawingImageOptions" hidden><button id="pasteDrawing" type="button" data-i18n="Aus Zwischenablage einfügen">Aus Zwischenablage einfügen</button><label class="upload"><span data-i18n="Bild für Zeichenebene öffnen">Bild für Zeichenebene öffnen</span><input id="drawingFile" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/gif"></label><div class="row"><label><span data-i18n="Eingefügte Bildbreite (px)">Eingefügte Bildbreite (px)</span><input id="drawingImageWidth" type="number" min="1" max="4096" step="1" value="80"></label><label class="check"><input id="drawingSmooth" type="checkbox" checked><span data-i18n="Bild glätten">Bild glätten</span></label></div><p id="drawingImageName" class="hint" data-i18n="Noch kein Einfügebild geladen.">Noch kein Einfügebild geladen.</p></div><p class="hint" data-i18n="Rechteck und Ellipse: von Ecke zu Ecke ziehen. Shift hält das Seitenverhältnis, Alt erzwingt 1:1; gilt auch an den Eckgriffen vorhandener Formen. Kreis weiterhin vom Mittelpunkt aus. Bei Touch ersetzt der Schalter die Shift-Taste.">Rechteck und Ellipse: von Ecke zu Ecke ziehen. Shift hält das Seitenverhältnis, Alt erzwingt 1:1; gilt auch an den Eckgriffen vorhandener Formen. Kreis weiterhin vom Mittelpunkt aus. Bei Touch ersetzt der Schalter die Shift-Taste.</p><div class="row wrap"><button id="drawingUndo" disabled data-i18n="Rückgängig">Rückgängig</button><button id="drawingRedo" disabled data-i18n="Wiederholen">Wiederholen</button><button id="drawingClear" disabled data-i18n="Zeichenebene leeren">Zeichenebene leeren</button><span id="drawingCount" class="hint"></span></div><p class="hint" data-i18n="Auswählen / Bearbeiten: Element anklicken und ziehen; Eckpunkte ändern die Größe. Formen in der Zielvorschau ziehen; Kreis vom Mittelpunkt aus. Text und Bilder per Klick einsetzen. Der Radierer entfernt nur Zeichnungen. Escape verwirft den aktuellen Zug. Bei aktivem Zeichnen ist das Verschieben des Quellbildes gesperrt.">Auswählen / Bearbeiten: Element anklicken und ziehen; Eckpunkte ändern die Größe. Formen in der Zielvorschau ziehen; Kreis vom Mittelpunkt aus. Text und Bilder per Klick einsetzen. Der Radierer entfernt nur Zeichnungen. Escape verwirft den aktuellen Zug. Bei aktivem Zeichnen ist das Verschieben des Quellbildes gesperrt.</p><p class="hint" data-i18n="Die Zeichenebene bleibt bei Bildkorrekturen und Quellenwechsel erhalten. Sie liegt im originalen Displayraster und wird nicht mitskaliert. Export und Versand enthalten die sichtbare Ebene; Farben werden auf die aktuelle Palette abgebildet.">Die Zeichenebene bleibt bei Bildkorrekturen und Quellenwechsel erhalten. Sie liegt im originalen Displayraster und wird nicht mitskaliert. Export und Versand enthalten die sichtbare Ebene; Farben werden auf die aktuelle Palette abgebildet.</p></details><div class="previews"><figure><figcaption><b><span data-i18n="Quellbild">Quellbild</span></b><span id="sourceInfo"><span data-i18n="Kein Bild geladen">Kein Bild geladen</span></span><label class="previewZoom"><span data-i18n="Zoom">Zoom</span><select id="zoom" aria-label="Zoom Quellbild" data-i18n-aria-label="Zoom Quellbild"><option value="fit" data-i18n="Einpassen">Einpassen</option><option value=".25">25 %</option><option value=".5">50 %</option><option value="1">100 %</option><option value="2">200 %</option><option value="4">400 %</option><option value="8">800 %</option></select></label></figcaption><div class="canvaswell" id="sourceWell"><canvas id="source" width="592" height="256" aria-label="Originalbild und Ausschnitt" data-i18n-aria-label="Originalbild und Ausschnitt"></canvas><span id="emptySource" class="empty"><span data-i18n="Bild oder VLW hierher ziehen">Bild oder VLW hierher ziehen</span><br><small><span data-i18n="PNG, JPEG, WebP, BMP, GIF, VLW oder VLW.GZ">PNG, JPEG, WebP, BMP, GIF, VLW oder VLW.GZ</span></small></span></div></figure><figure><figcaption><b><span data-i18n="Display-Vorschau">Display-Vorschau</span></b><span id="targetInfo">296 × 128 px</span><label class="previewZoom"><span data-i18n="Zoom">Zoom</span><select id="targetZoom" aria-label="Zoom Zielbild" data-i18n-aria-label="Zoom Zielbild"><option value="fit" data-i18n="Einpassen">Einpassen</option><option value=".25">25 %</option><option value=".5">50 %</option><option value="1">100 %</option><option value="2">200 %</option><option value="4">400 %</option><option value="8">800 %</option></select></label></figcaption><div class="canvaswell"><canvas id="target" width="296" height="128" aria-label="Quantisiertes Zielbild" data-i18n-aria-label="Quantisiertes Zielbild"></canvas><span id="emptyTarget" class="empty"><span data-i18n="Keine Ausgabe vorhanden">Keine Ausgabe vorhanden</span></span></div><div class="targetViewControls"><label><span data-i18n="Entfernungsvorschau (Blur)">Entfernungsvorschau (Blur)</span><output id="targetBlurValue">0 px</output><input id="targetBlur" type="range" min="0" max="4" step="0.25" value="0"></label><p class="hint" data-i18n="Nur Anzeige, ohne Einfluss auf Export und Versand.">Nur Anzeige, ohne Einfluss auf Export und Versand.</p></div></figure></div><div class="previewfoot"><span id="imageName"><span data-i18n="Noch keine Datei">Noch keine Datei</span></span><span id="paletteInfo"><span data-i18n="Vorschau mit ausgewählter Farbpalette">Vorschau mit ausgewählter Farbpalette</span></span></div></section>
+<div class="previewWorkspaceTools"><label><span data-i18n="Maus / Touch">Maus / Touch</span><select id="previewInteraction"><option value="auto" data-i18n="Automatisch">Automatisch</option><option value="pan" data-i18n="Ansicht verschieben">Ansicht verschieben</option></select></label><label><span data-i18n="Bildbereich (% Fensterhöhe)">Bildbereich (% Fensterhöhe)</span><output id="previewHeightValue">55 %</output><input id="previewHeight" type="range" min="25" max="85" step="5" value="55"></label><button id="expandWorkspace" type="button" aria-pressed="false" data-i18n="Arbeitsansicht vergrößern">Arbeitsansicht vergrößern</button></div><p class="hint navigationHint" data-i18n="Ansicht: ziehen zum Verschieben, Strg + Mausrad zum Zoomen; Mitteltaste oder Leertaste + Ziehen auch beim Zeichnen. Touch: zwei Finger zum Verschieben und Zoomen. Ausschnittwahl, Zeichenwerkzeuge und Bildpositionierung haben im Automatikmodus Vorrang. Nur Anzeige; kein Einfluss auf Export.">Ansicht: ziehen zum Verschieben, Strg + Mausrad zum Zoomen; Mitteltaste oder Leertaste + Ziehen auch beim Zeichnen. Touch: zwei Finger zum Verschieben und Zoomen. Ausschnittwahl, Zeichenwerkzeuge und Bildpositionierung haben im Automatikmodus Vorrang. Nur Anzeige; kein Einfluss auf Export.</p><details id="methodGuide" class="testPatternControls"><summary data-i18n="Dithering und Optimierungen · Beispiele">Dithering und Optimierungen · Beispiele</summary><p class="hint" data-i18n="Eingebaute Beispielgrafik mit der aktuellen Palette. Vergleich bei voller Dither-Stärke; feste Mischfarben mit höchstens zwei Farben. Die Beispielbilder zeigen nicht die aktuellen Bildkorrekturen. RGB und Palettenfarbraum sind Vorbereitungen, keine fertige Displayausgabe.">Eingebaute Beispielgrafik mit der aktuellen Palette. Vergleich bei voller Dither-Stärke; feste Mischfarben mit höchstens zwei Farben. Die Beispielbilder zeigen nicht die aktuellen Bildkorrekturen. RGB und Palettenfarbraum sind Vorbereitungen, keine fertige Displayausgabe.</p><div id="methodExamples"></div></details><details id="testPatternPanel" class="testPatternControls"><summary data-i18n="Test- und Beispielbilder">Test- und Beispielbilder</summary><div class="row wrap"><label><span data-i18n="Testbild-Bereich">Testbild-Bereich</span><select id="testPatternMode"><option value="noise" data-i18n="Farbrauschen (Vollbild)">Farbrauschen (Vollbild)</option><option value="solid" data-i18n="Vollfarbe (Vollbild)">Vollfarbe (Vollbild)</option><option value="checker" data-i18n="Schachbrett (Vollbild)">Schachbrett (Vollbild)</option><option value="all" selected data-i18n="Gesamtes Testbild">Gesamtes Testbild</option><option value="colors" data-i18n="Farbflächen">Farbflächen</option><option value="lines" data-i18n="Linienauflösung">Linienauflösung</option><option value="pairs" data-i18n="Farbmischungen">Farbmischungen</option><option value="gradients" data-i18n="Farbverläufe">Farbverläufe</option></select></label><button id="testPattern"><span data-i18n="Testbild erzeugen">Testbild erzeugen</span></button><button id="demo"><span data-i18n="Beispiel laden">Beispiel laden</span></button></div><div id="patternOptions" hidden><div class="row"><label id="patternLabelsControl"><span data-i18n="Testbild-Beschriftung">Testbild-Beschriftung</span><select id="patternLabels"><option value="auto" data-i18n="Automatisch nach Displaygröße">Automatisch nach Displaygröße</option><option value="on" data-i18n="Alle Bezeichnungen">Alle Bezeichnungen</option><option value="off" data-i18n="Nur Auflösung">Nur Auflösung</option></select></label><label id="patternSeedControl" hidden><span data-i18n="Rausch-Startwert">Rausch-Startwert</span><input id="patternSeed" type="number" min="0" max="4294967295" step="1" value="1"><button id="newPatternSeed" data-i18n="Neuer Startwert">Neuer Startwert</button></label><label id="patternFirstColor"><span data-i18n="Testfarbe">Testfarbe</span><select id="patternColorA"></select></label><label id="patternSecondColor"><span data-i18n="Zweite Testfarbe">Zweite Testfarbe</span><select id="patternColorB"></select></label><label id="patternCellControl"><span data-i18n="Schachbrett-Feldgröße (px)">Schachbrett-Feldgröße (px)</span><output id="patternCellValue">1</output><input id="patternCell" type="range" min="1" max="64" step="1" value="1"></label></div><div id="patternMixControls" hidden><div class="row wrap"><label><span data-i18n="Anzahl Mischfarben">Anzahl Mischfarben</span><select id="patternMixSize"></select></label><button id="patternMixPrevious" data-i18n="Vorherige Seite">Vorherige Seite</button><label><span data-i18n="Mischungsseite">Mischungsseite</span><input id="patternMixPage" type="number" min="1" step="1" value="1"></label><button id="patternMixNext" data-i18n="Nächste Seite">Nächste Seite</button></div><p id="patternMixInfo" class="hint"></p><details><summary data-i18n="Mischfeld-Legende">Mischfeld-Legende</summary><p id="patternMixLegend" class="hint"></p></details><p class="hint" data-i18n="Gleiche Anteile je Farbe, maximal zwölf Felder pro Seite. Das allgemeine Testbild enthält weiterhin nur Zweiermischungen.">Gleiche Anteile je Farbe, maximal zwölf Felder pro Seite. Das allgemeine Testbild enthält weiterhin nur Zweiermischungen.</p></div><p id="noiseHint" class="hint" hidden data-i18n="Farbrauschen verwendet die aktuelle Palette. Gleicher Startwert erzeugt dasselbe Muster. Für große, schlecht komprimierbare Testdateien; die Funkdatenmenge hängt von AP und Display ab.">Farbrauschen verwendet die aktuelle Palette. Gleicher Startwert erzeugt dasselbe Muster. Für große, schlecht komprimierbare Testdateien; die Funkdatenmenge hängt von AP und Display ab.</p></div></details><details id="drawingPanel" class="drawingControls"><summary data-i18n="Zeichenebene">Zeichenebene</summary><div class="row wrap"><label class="check"><input id="drawingEnabled" type="checkbox"><span data-i18n="Auf Zielbild zeichnen">Auf Zielbild zeichnen</span></label><label class="check"><input id="drawingVisible" type="checkbox" checked><span data-i18n="Zeichenebene anzeigen">Zeichenebene anzeigen</span></label><button id="drawingBlank" data-i18n="Leere Zeichenfläche">Leere Zeichenfläche</button></div><div class="row wrap"><label><span data-i18n="Zeichenwerkzeug">Zeichenwerkzeug</span><select id="drawingTool"><option value="select" data-i18n="Auswählen / Bearbeiten">Auswählen / Bearbeiten</option><option value="line" selected data-i18n="Linie">Linie</option><option value="rectangle" data-i18n="Rechteck">Rechteck</option><option value="square" data-i18n="Quadrat">Quadrat</option><option value="ellipse" data-i18n="Ellipse">Ellipse</option><option value="circle" data-i18n="Kreis">Kreis</option><option value="text" data-i18n="Text">Text</option><option value="eraser" data-i18n="Radierer">Radierer</option><option value="image" data-i18n="Bild einfügen">Bild einfügen</option></select></label><label><span data-i18n="Zeichenfarbe">Zeichenfarbe</span> <span id="drawingColorSwatch" class="drawingColorSwatch" aria-hidden="true"></span><select id="drawingColor"></select></label><label><span data-i18n="Strich / Radierer (px)">Strich / Radierer (px)</span><output id="drawingWidthValue">1</output><input id="drawingWidth" type="range" min="1" max="64" step="1" value="1"></label><label class="check"><input id="drawingAspect" type="checkbox"><span data-i18n="Seitenverhältnis halten (Shift)">Seitenverhältnis halten (Shift)</span></label><label class="check"><input id="drawingFill" type="checkbox"><span data-i18n="Form ausfüllen">Form ausfüllen</span></label></div><div class="row wrap"><label><span data-i18n="Vorhandenes Element">Vorhandenes Element</span><select id="drawingObjects"></select></label><button id="drawingDelete" disabled data-i18n="Element entfernen">Element entfernen</button></div><div id="drawingTextOptions" hidden><label><span data-i18n="Schriftart">Schriftart</span><select id="drawingFont"><option value="sans" data-i18n="Standard · ohne Serifen">Standard · ohne Serifen</option><option value="serif" data-i18n="Standard · mit Serifen">Standard · mit Serifen</option><option value="mono" data-i18n="Standard · Festbreite">Standard · Festbreite</option><option value="arial">Arial</option><option value="verdana">Verdana</option><option value="trebuchet">Trebuchet MS</option><option value="georgia">Georgia</option><option value="times">Times New Roman</option><option value="courier">Courier New</option></select></label><p class="hint" data-i18n="Verwendet lokal verfügbare Schriften. Fehlt eine Schrift, verwendet der Browser eine passende Ersatzschrift. Texte werden als Bild exportiert; der AP benötigt die Schrift nicht.">Verwendet lokal verfügbare Schriften. Fehlt eine Schrift, verwendet der Browser eine passende Ersatzschrift. Texte werden als Bild exportiert; der AP benötigt die Schrift nicht.</p><label><span data-i18n="Textinhalt">Textinhalt</span><textarea id="drawingText" rows="2" maxlength="1000">Text</textarea></label><div class="row"><label><span data-i18n="Schriftgröße (px)">Schriftgröße (px)</span><output id="drawingSizeValue">16</output><input id="drawingSize" type="range" min="8" max="160" step="1" value="16"></label><label class="check"><input id="drawingBold" type="checkbox" checked><span data-i18n="Fettschrift">Fettschrift</span></label></div></div><div id="drawingImageOptions" hidden><button id="pasteDrawing" type="button" data-i18n="Aus Zwischenablage einfügen">Aus Zwischenablage einfügen</button><label class="upload"><span data-i18n="Bild für Zeichenebene öffnen">Bild für Zeichenebene öffnen</span><input id="drawingFile" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/gif"></label><div class="row"><label><span data-i18n="Eingefügte Bildbreite (px)">Eingefügte Bildbreite (px)</span><input id="drawingImageWidth" type="number" min="1" max="4096" step="1" value="80"></label><label class="check"><input id="drawingSmooth" type="checkbox" checked><span data-i18n="Bild glätten">Bild glätten</span></label></div><p id="drawingImageName" class="hint" data-i18n="Noch kein Einfügebild geladen.">Noch kein Einfügebild geladen.</p></div><p class="hint" data-i18n="Rechteck und Ellipse: von Ecke zu Ecke ziehen. Shift hält das Seitenverhältnis, Alt erzwingt 1:1; gilt auch an den Eckgriffen vorhandener Formen. Kreis weiterhin vom Mittelpunkt aus. Bei Touch ersetzt der Schalter die Shift-Taste.">Rechteck und Ellipse: von Ecke zu Ecke ziehen. Shift hält das Seitenverhältnis, Alt erzwingt 1:1; gilt auch an den Eckgriffen vorhandener Formen. Kreis weiterhin vom Mittelpunkt aus. Bei Touch ersetzt der Schalter die Shift-Taste.</p><div class="row wrap"><button id="drawingUndo" disabled data-i18n="Rückgängig">Rückgängig</button><button id="drawingRedo" disabled data-i18n="Wiederholen">Wiederholen</button><button id="drawingClear" disabled data-i18n="Zeichenebene leeren">Zeichenebene leeren</button><span id="drawingCount" class="hint"></span></div><p class="hint" data-i18n="Auswählen / Bearbeiten: Element anklicken und ziehen; Eckpunkte ändern die Größe. Formen in der Zielvorschau ziehen; Kreis vom Mittelpunkt aus. Text und Bilder per Klick einsetzen. Der Radierer entfernt nur Zeichnungen. Escape verwirft den aktuellen Zug. Bei aktivem Zeichnen ist das Verschieben des Quellbildes gesperrt.">Auswählen / Bearbeiten: Element anklicken und ziehen; Eckpunkte ändern die Größe. Formen in der Zielvorschau ziehen; Kreis vom Mittelpunkt aus. Text und Bilder per Klick einsetzen. Der Radierer entfernt nur Zeichnungen. Escape verwirft den aktuellen Zug. Bei aktivem Zeichnen ist das Verschieben des Quellbildes gesperrt.</p><p class="hint" data-i18n="Die Zeichenebene bleibt bei Bildkorrekturen und Quellenwechsel erhalten. Sie liegt im originalen Displayraster und wird nicht mitskaliert. Export und Versand enthalten die sichtbare Ebene; Farben werden auf die aktuelle Palette abgebildet.">Die Zeichenebene bleibt bei Bildkorrekturen und Quellenwechsel erhalten. Sie liegt im originalen Displayraster und wird nicht mitskaliert. Export und Versand enthalten die sichtbare Ebene; Farben werden auf die aktuelle Palette abgebildet.</p></details><div class="previews"><figure><figcaption><b><span data-i18n="Quellbild">Quellbild</span></b><span id="sourceInfo"><span data-i18n="Kein Bild geladen">Kein Bild geladen</span></span><label class="previewZoom"><span data-i18n="Zoom">Zoom</span><select id="zoom" aria-label="Zoom Quellbild" data-i18n-aria-label="Zoom Quellbild"><option value="fit" data-i18n="Einpassen">Einpassen</option><option value=".25">25 %</option><option value=".5">50 %</option><option value="1">100 %</option><option value="2">200 %</option><option value="4">400 %</option><option value="8">800 %</option></select></label></figcaption><div class="canvaswell" id="sourceWell"><canvas id="source" width="592" height="256" aria-label="Originalbild und Ausschnitt" data-i18n-aria-label="Originalbild und Ausschnitt"></canvas><span id="emptySource" class="empty"><span data-i18n="Bild oder VLW hierher ziehen">Bild oder VLW hierher ziehen</span><br><small><span data-i18n="PNG, JPEG, WebP, BMP, GIF, VLW oder VLW.GZ">PNG, JPEG, WebP, BMP, GIF, VLW oder VLW.GZ</span></small></span></div></figure><figure><figcaption><b><span data-i18n="Display-Vorschau">Display-Vorschau</span></b><span id="targetInfo">296 × 128 px</span><label class="previewZoom"><span data-i18n="Zoom">Zoom</span><select id="targetZoom" aria-label="Zoom Zielbild" data-i18n-aria-label="Zoom Zielbild"><option value="fit" data-i18n="Einpassen">Einpassen</option><option value=".25">25 %</option><option value=".5">50 %</option><option value="1">100 %</option><option value="2">200 %</option><option value="4">400 %</option><option value="8">800 %</option></select></label></figcaption><div class="canvaswell"><canvas id="target" width="296" height="128" aria-label="Quantisiertes Zielbild" data-i18n-aria-label="Quantisiertes Zielbild"></canvas><span id="emptyTarget" class="empty"><span data-i18n="Keine Ausgabe vorhanden">Keine Ausgabe vorhanden</span></span></div><div class="targetViewControls"><label><span data-i18n="Vorschaufarben">Vorschaufarben</span><select id="profilePreview"><option value="profile" data-i18n="Nach Farbprofil">Nach Farbprofil</option><option value="ideal" data-i18n="Idealisiert">Idealisiert</option></select></label><label><span data-i18n="Entfernungsvorschau (Blur)">Entfernungsvorschau (Blur)</span><output id="targetBlurValue">0 px</output><input id="targetBlur" type="range" min="0" max="4" step="0.25" value="0"></label><p class="hint" data-i18n="Nur Anzeige, ohne Einfluss auf Export und Versand.">Nur Anzeige, ohne Einfluss auf Export und Versand.</p></div></figure></div><div class="previewfoot"><span id="imageName"><span data-i18n="Noch keine Datei">Noch keine Datei</span></span><span id="paletteInfo"><span data-i18n="Vorschau mit ausgewählter Farbpalette">Vorschau mit ausgewählter Farbpalette</span></span></div></section>
 </div></div>
 <div class="delivery"><section><h2><span>04</span> Export</h2><label><span data-i18n="Dateiorientierung beim Speichern">Dateiorientierung beim Speichern</span><select id="exportOrientation"><option value="native" data-i18n="Originales Displayformat">Originales Displayformat</option><option value="view" data-i18n="Aktuelle Darstellung / Aufstellung">Aktuelle Darstellung / Aufstellung</option></select></label><label class="check"><input id="exportContentOnly" type="checkbox"> <span data-i18n="Nur Bildfläche speichern (ohne Einpassränder)">Nur Bildfläche speichern (ohne Einpassränder)</span></label><p class="hint"><span data-i18n="Entfernt nur beim Einpassen ergänzte Displayränder. Ränder im Quellbild bleiben erhalten. Gilt für PNG, JPEG, VLW und AP-Dateiablage; Direktversand und VLW-Test behalten das vollständige Displayformat.">Entfernt nur beim Einpassen ergänzte Displayränder. Ränder im Quellbild bleiben erhalten. Gilt für PNG, JPEG, VLW und AP-Dateiablage; Direktversand und VLW-Test behalten das vollständige Displayformat.</span></p><p class="hint" id="orientationInfo"><span data-i18n="Direktversand und VLW-Test verwenden immer das originale Displayformat.">Direktversand und VLW-Test verwenden immer das originale Displayformat.</span></p><div class="exports"><button id="png" disabled class="primary">PNG <small><span data-i18n="Verlustfrei">Verlustfrei</span></small></button><button id="jpeg" disabled>OEPL-JPEG <small><span data-i18n="Baseline · 4:4:4 · Qualität 100">Baseline · 4:4:4 · Qualität 100</span></small></button><div class="vlwExport"><button id="vlw" disabled><span data-i18n="VLW-Font">VLW-Font</span> <small><span data-i18n="Alle Farben + Alphamaske">Alle Farben + Alphamaske</span></small></button><p id="vlwWarning" class="vlwInlineWarning" role="status" hidden><span aria-hidden="true">⚠</span><span data-i18n="Zeichen über 255 Pixel können vom VLW-Renderer fehlerhaft dargestellt werden.">Zeichen über 255 Pixel können vom VLW-Renderer fehlerhaft dargestellt werden.</span></p><label class="check gzipChoice"><input id="gzipFont" type="checkbox" checked> <span data-i18n="VLW mit Gzip packen (.vlw.gz)">VLW mit Gzip packen (.vlw.gz)</span></label></div></div><p class="hint"><span data-i18n="JPEG: verlustbehaftet, Qualität 100 ohne Farbunterabtastung. PNG: verlustfrei, mit Transparenz.">JPEG: verlustbehaftet, Qualität 100 ohne Farbunterabtastung. PNG: verlustfrei, mit Transparenz.</span></p><details><summary><span data-i18n="VLW-Einstellungen &amp; Verwendung">VLW-Einstellungen &amp; Verwendung</span></summary><label class="check"><input id="xpatch" type="checkbox"> <span data-i18n="x-Position-0-Patch anwenden">x-Position-0-Patch anwenden</span></label><label class="check"><input id="alphaPlane" type="checkbox" checked> <span data-i18n="Separate Deckungsmaske ergänzen">Separate Deckungsmaske ergänzen</span></label><p id="vlwInfo" class="hint"><span data-i18n="Ein Glyph pro Palettenfarbe, ergänzt um die optionale Deckungsmaske.">Ein Glyph pro Palettenfarbe, ergänzt um die optionale Deckungsmaske.</span></p><button id="manifest"><span data-i18n="Ebenenplan als JSON">Ebenenplan als JSON</span></button><pre id="vlwExample"><span data-i18n="Bitte zuerst ein Bild laden.">Bitte zuerst ein Bild laden.</span></pre></details></section>
-<section><h2><span>05</span> <span data-i18n="OpenEPaperLink verbinden">OpenEPaperLink verbinden</span></h2><p class="hint"><span data-i18n="Display auswählen, Profil übernehmen und Bilder vom AP laden oder an ihn senden.">Display auswählen, Profil übernehmen und Bilder vom AP laden oder an ihn senden.</span></p><div class="row wrap"><label class="grow"><span data-i18n="AP-Adresse">AP-Adresse</span><input id="apAddress" list="knownAPs" placeholder="http://192.168.1.50" autocomplete="url"></label><datalist id="knownAPs"></datalist><button id="connect"><span data-i18n="Verbinden">Verbinden</span></button><button id="discover"><span data-i18n="Bekannte APs suchen">Bekannte APs suchen</span></button></div><p class="hint"><span data-i18n="Geprüft werden gespeicherte Adressen und openepaperlink.local. Browser erlauben keinen allgemeinen Netzwerk-Scan. Bei blockiertem Zugriff die App vom selben AP bereitstellen; Details in der README.">Geprüft werden gespeicherte Adressen und openepaperlink.local. Browser erlauben keinen allgemeinen Netzwerk-Scan. Bei blockiertem Zugriff die App vom selben AP bereitstellen; Details in der README.</span></p><div class="row"><label class="grow"><span data-i18n="Displays auf diesem AP">Displays auf diesem AP</span><select id="tags"><option value="" data-i18n="Zuerst verbinden">Zuerst verbinden</option></select></label><button id="profile" disabled><span data-i18n="Profil übernehmen">Profil übernehmen</span></button></div><label><span data-i18n="Display-MAC (auch manuell)">Display-MAC (auch manuell)</span><input id="mac" placeholder="0011223344556677" maxlength="23"></label><p id="tagInfo" class="hint"><span data-i18n="Noch kein Display ausgewählt.">Noch kein Display ausgewählt.</span></p><div class="row wrap"><button id="read" disabled><span data-i18n="AP-Bild als Quelle laden">AP-Bild als Quelle laden</span></button><button id="raw" disabled><span data-i18n="RAW herunterladen">RAW herunterladen</span></button><button id="send" disabled class="primary"><span data-i18n="An Display senden">An Display senden</span></button></div><p class="hint"><span data-i18n="Senden ersetzt den Displayinhalt beim nächsten Abruf. Das AP-Bild kann vom tatsächlichen Displaystand abweichen. Bei HTTP 413 wird dasselbe JPEG über die AP-Dateiverwaltung übertragen; dafür wird freier Dateispeicher benötigt. Kein Upload erfolgt automatisch.">Senden ersetzt den Displayinhalt beim nächsten Abruf. Das AP-Bild kann vom tatsächlichen Displaystand abweichen. Bei HTTP 413 wird dasselbe JPEG über die AP-Dateiverwaltung übertragen; dafür wird freier Dateispeicher benötigt. Kein Upload erfolgt automatisch.</span></p></section>
+<section><h2><span>05</span> <span data-i18n="OpenEPaperLink verbinden">OpenEPaperLink verbinden</span></h2><p class="hint"><span data-i18n="Display auswählen, Profil übernehmen und Bilder vom AP laden oder an ihn senden.">Display auswählen, Profil übernehmen und Bilder vom AP laden oder an ihn senden.</span></p><div class="row wrap"><label class="grow"><span data-i18n="AP-Adresse">AP-Adresse</span><input id="apAddress" list="knownAPs" placeholder="http://192.168.1.50" autocomplete="url"></label><datalist id="knownAPs"></datalist><button id="connect"><span data-i18n="Verbinden">Verbinden</span></button><button id="discover"><span data-i18n="Bekannte APs suchen">Bekannte APs suchen</span></button></div><p class="hint"><span data-i18n="Geprüft werden gespeicherte Adressen und openepaperlink.local. Browser erlauben keinen allgemeinen Netzwerk-Scan. Bei blockiertem Zugriff die App vom selben AP bereitstellen; Details in der README.">Geprüft werden gespeicherte Adressen und openepaperlink.local. Browser erlauben keinen allgemeinen Netzwerk-Scan. Bei blockiertem Zugriff die App vom selben AP bereitstellen; Details in der README.</span></p><div class="row"><label class="grow"><span data-i18n="Displays auf diesem AP">Displays auf diesem AP</span><select id="tags"><option value="" data-i18n="Zuerst verbinden">Zuerst verbinden</option></select></label><button id="profile" disabled><span data-i18n="Profil übernehmen">Profil übernehmen</span></button></div><label class="check"><input id="takeColorProfile" type="checkbox" checked><span data-i18n="AP-Farbprofil ebenfalls übernehmen">AP-Farbprofil ebenfalls übernehmen</span></label><label><span data-i18n="Display-MAC (auch manuell)">Display-MAC (auch manuell)</span><input id="mac" placeholder="0011223344556677" maxlength="23"></label><p id="tagInfo" class="hint"><span data-i18n="Noch kein Display ausgewählt.">Noch kein Display ausgewählt.</span></p><div class="row wrap"><button id="read" disabled><span data-i18n="AP-Bild als Quelle laden">AP-Bild als Quelle laden</span></button><button id="raw" disabled><span data-i18n="RAW herunterladen">RAW herunterladen</span></button><button id="send" disabled class="primary"><span data-i18n="An Display senden">An Display senden</span></button></div><p class="hint"><span data-i18n="Senden ersetzt den Displayinhalt beim nächsten Abruf. Das AP-Bild kann vom tatsächlichen Displaystand abweichen. Bei HTTP 413 wird dasselbe JPEG über die AP-Dateiverwaltung übertragen; dafür wird freier Dateispeicher benötigt. Kein Upload erfolgt automatisch.">Senden ersetzt den Displayinhalt beim nächsten Abruf. Das AP-Bild kann vom tatsächlichen Displaystand abweichen. Bei HTTP 413 wird dasselbe JPEG über die AP-Dateiverwaltung übertragen; dafür wird freier Dateispeicher benötigt. Kein Upload erfolgt automatisch.</span></p></section>
 
 <section><h2><span>06</span> <span data-i18n="Dateien auf dem AP">Dateien auf dem AP</span></h2>
 <p class="hint"><span data-i18n="JPEG oder VLW im AP-Dateisystem speichern. Es gilt die gewählte Exportorientierung. Der VLW-Test verwendet das originale Displayformat.">JPEG oder VLW im AP-Dateisystem speichern. Es gilt die gewählte Exportorientierung. Der VLW-Test verwendet das originale Displayformat.</span></p>
@@ -1631,6 +1675,18 @@ function getImageDataFromImage(idOrElement){
 /* English UI catalog. German source strings are stable translation keys. */
 (function(root) {
   const messages = {
+  "BWRY · generische Näherung (feine Raster)": "BWRY · generic approximation (fine patterns)",
+  "Abgerundete Referenzfarben aus Foto-/Herstellervergleichen; Rasterwirkung aus Kamera-/Scannervergleichen angenähert. Kein universelles Panelprofil.": "Rounded references from photo/manufacturer comparisons; fine-pattern response approximated from camera/scanner comparisons. Not a universal panel calibration.",
+  "Mischungsmodell": "Mixture model",
+  "Bisherige RGB-Berechnung": "Previous RGB calculation",
+  "Reflexionsmodell für feine Raster": "Reflectance model for fine patterns",
+  "Rasterexponent (1 = linear)": "Pattern exponent (1 = linear)",
+  "Näherung für feine Raster; größere Werte berücksichtigen stärkere Abdunklung. Für grobe Muster und andere Panels nicht kalibriert. Änderungen mit Speichern übernehmen.": "Approximation for fine patterns; higher values account for stronger darkening. Not calibrated for coarse patterns or other panels. Apply changes with Save.",
+  "Reflexionsmodell: Vollfarben und Rasterwirkung getrennt. XYZ-Rechenwerte bleiben unbeschnitten; RGB-Werte dienen nur der Vorschau.": "Reflectance model: solid colors and pattern response are separate. XYZ calculation values remain unclipped; RGB values are for preview only.",
+  "Rasterexponent: {value}": "Pattern exponent: {value}",
+  "Vorschau: {color}": "Preview: {color}",
+  "Nur Bildschirmdarstellung der Rechenreferenz": "Screen illustration of the calculation reference only",
+
   "Zwischenablage": "Clipboard",
   "Bild aus Zwischenablage": "Paste image",
   "Als Quellbild einfügen": "Paste as source image",
@@ -1684,11 +1740,7 @@ function getImageDataFromImage(idOrElement){
   "Dunkelgrün": "Dark green",
   "Dunkelblau": "Navy",
   "Blaugrün": "Teal",
-  "Weiß": "White",
   "Schwarz": "Black",
-  "Rot": "Red",
-  "Grün": "Green",
-  "Blau": "Blue",
   "Gelb": "Yellow",
   "Orange": "Orange",
   "Cyan": "Cyan",
@@ -1768,7 +1820,6 @@ function getImageDataFromImage(idOrElement){
   "Farbmischungen": "Color mixtures",
   "Farbverläufe": "Gradients",
   "Testbild erzeugen": "Generate test chart",
-  "Farben": "colors",
   "1:1 übernimmt die Pixelmaße des Ausschnitts, zentriert ohne Skalierung. Displaygröße und Farbkonvertierung bleiben erhalten. Der Ausschnitt muss ganzzahlig sein und vollständig passen.": "1:1 centers the crop at its original pixel dimensions. Display dimensions and color conversion are retained. The crop must use integer coordinates and fit entirely.",
   "Für 1:1 bitte einen Ausschnitt mit ganzzahligen Pixelmaßen wählen (Seitenverhältnis-Bindung ggf. lösen).": "For 1:1, choose a crop with integer pixel coordinates and dimensions (disable aspect ratio locking if needed).",
   "Der Ausschnitt passt nicht 1:1 auf das Display. Bitte den Ausschnitt verkleinern oder eine andere Einpassoption wählen.": "The crop does not fit on the display at 1:1. Reduce the crop or choose another fit option.",
@@ -2187,6 +2238,7 @@ function getImageDataFromImage(idOrElement){
   "1,54″ · 200 × 200": "1.54″ · 200 × 200",
   "2,13″ · 250 × 122": "2.13″ · 250 × 122",
   "2,9″ · 296 × 128": "2.9″ · 296 × 128",
+  "2,9″ · M3 · 384 × 168": "2.9″ · M3 · 384 × 168",
   "4,2″ · 400 × 300": "4.2″ · 400 × 300",
   "5,65″ · 600 × 448": "5.65″ · 600 × 448",
   "5,83″ · 648 × 480": "5.83″ · 648 × 480",
@@ -2295,7 +2347,56 @@ function getImageDataFromImage(idOrElement){
 "Farbstufen · ": "Continuous colors · ",
 "VLW benötigt feste Palettenfarben. Bitte einen quantisierten Ausgabemodus wählen.": "VLW requires discrete palette colors. Select a quantized output mode.",
 "Ungültige AP-Dithering-Auswahl.": "Invalid AP dithering selection.",
-"Farbstufen bleiben ohne Raster erhalten. RGB übernimmt alle Farben; Palettenfarbraum begrenzt sie auf darstellbare Mischfarben der Palette. Farbkorrekturen bleiben aktiv, Einzel-Farbgewichtung und Dither-Stärke entfallen. Invertieren kehrt alle RGB-Kanäle um. PNG/JPEG speichern diese Vorbereitung; die endgültige Darstellung bestimmt der AP. VLW ist hier nicht verfügbar.": "Gradients are preserved without dithering. RGB keeps all colors; palette gamut limits them to mixtures of the selected palette. Color corrections remain active; individual color bias and dithering strength do not apply. Invert reverses all RGB channels. PNG/JPEG save this preparation; the AP determines the final appearance. VLW is unavailable in this mode."
+"Farbstufen bleiben ohne Raster erhalten. RGB übernimmt alle Farben; Palettenfarbraum begrenzt sie auf darstellbare Mischfarben der Palette. Farbkorrekturen bleiben aktiv, Einzel-Farbgewichtung und Dither-Stärke entfallen. Invertieren kehrt alle RGB-Kanäle um. PNG/JPEG speichern diese Vorbereitung; die endgültige Darstellung bestimmt der AP. VLW ist hier nicht verfügbar.": "Gradients are preserved without dithering. RGB keeps all colors; palette gamut limits them to mixtures of the selected palette. Color corrections remain active; individual color bias and dithering strength do not apply. Invert reverses all RGB channels. PNG/JPEG save this preparation; the AP determines the final appearance. VLW is unavailable in this mode.",
+"Farbprofil für die Berechnung": "Calculation color profile",
+"Das Profil steuert Farbzuordnung, Dithering und feste Mischfarben. Export und Versand verwenden weiterhin die ursprünglichen Displayfarben.": "The profile controls color matching, dithering and fixed mixtures. Exports and uploads still use the original display color codes.",
+"Bei erhaltenen Farbstufen wird das Farbprofil nicht angewendet; die endgültige Quantisierung übernimmt der AP.": "The color profile is not applied in continuous-tone modes; the AP performs the final quantization.",
+"Farbprofil bearbeiten / eigenes Profil speichern": "Edit color profile / save your own",
+"Profilfarben für jede Displayfarbe festlegen. Änderungen werden erst mit Speichern übernommen. Herstellerdaten und Näherungen sind keine Kalibrierung des eigenen Panels.": "Set a reference for each display color. Changes apply when saved. Manufacturer data and approximations are not a calibration of your own panel.",
+"Profilname": "Profile name",
+"Herkunft / Messbedingungen": "Source / measurement conditions",
+"Datengrundlage": "Data basis",
+"Näherung": "Approximation",
+"Eigene Messung": "Own measurement",
+"Herstellerangabe": "Manufacturer specification",
+"Farbprofil speichern und anwenden": "Save and apply color profile",
+"Eigenes Farbprofil löschen": "Delete custom color profile",
+"Farbprofil als JSON speichern": "Save color profile as JSON",
+"Farbprofil importieren (JSON)": "Import color profile (JSON)",
+"Vorschaufarben": "Preview colors",
+"Nach Farbprofil": "Use color profile",
+"Idealisiert": "Idealized",
+"Idealisiert – reine RGB-Farben": "Idealized – pure RGB colors",
+"AP-Farbprofil ebenfalls übernehmen": "Also apply the AP color profile",
+"Bisherige Berechnung mit idealen RGB-Farben.": "Existing calculation with ideal RGB colors.",
+"Profilfarbe für {color}": "Profile color for {color}",
+"RGB-Wert für {color}": "RGB value for {color}",
+"Bitte #RRGGBB eingeben.": "Enter #RRGGBB.",
+"Farbprofil gespeichert und für die Berechnung aktiviert.": "Color profile saved and activated for calculation.",
+"Eigenes Farbprofil gelöscht.": "Custom color profile deleted.",
+"Das Farbprofil passt nicht zu den gewählten Displayfarben. Bitte zuerst die passende Farbpalette wählen.": "The color profile does not match the selected display colors. Select the matching output palette first.",
+"Farbprofil importiert und aktiviert.": "Color profile imported and activated.",
+"Ungültiges Farbprofil. Name, Farben, Herkunft und Dateiformat prüfen (höchstens 50 Profile, 32 KiB je Import).": "Invalid color profile. Check name, colors, source and file format (up to 50 profiles, 32 KiB per import).",
+"Berechnung mit Farbprofil: {name}": "Calculation using color profile: {name}",
+"Kein aktives Farbprofil; idealisierte Farben werden verwendet.": "No active color profile; idealized colors are used.",
+"Quelle": "Source",
+"Profilhelligkeit": "Profile lightness",
+"Relativ normalisiert": "Relatively normalized",
+"Unnormalisierte Referenzwerte": "Unnormalized references",
+"Hersteller-Näherung: D65-Bezugsweiß angenommen. Keine bestätigte Kalibrierung des gewählten Panels.": "Manufacturer approximation: D65 reference white assumed. Not a confirmed calibration of the selected panel.",
+"Profilfarben für jede Displayfarbe festlegen. Die Eingabefelder bleiben unnormalisierte Referenzwerte. Änderungen werden erst mit Speichern übernommen. Herstellerdaten und Näherungen sind keine Kalibrierung des eigenen Panels.": "Set a reference for each display color. Input fields retain the unnormalized references. Changes apply when saved. Manufacturer data and approximations are not a calibration of your own panel.",
+"Idealisiert: keine zusätzliche Normalisierung.": "Idealized: no additional normalization.",
+"Normalisierung benötigt unterschiedliche Referenzwerte für Weiß und Schwarz. Die Originalwerte bleiben aktiv.": "Normalization requires distinct white and black references. The original values remain active.",
+"Unnormalisierte Referenzfarben für Berechnung und Profilvorschau.": "Unnormalized reference colors for calculation and profile preview.",
+"Panelweiß → Weiß, Panelschwarz → Schwarz; gemeinsame Helligkeitsabbildung, Farbton bezogen auf Panelweiß erhalten.": "Panel white → white, panel black → black; shared lightness mapping, preserving hue relative to panel white.",
+"Sättigung bei Bedarf auf sRGB begrenzt.": "Chroma reduced to fit sRGB where needed.",
+"Wirksam: {color}": "Effective: {color}",
+"Berechnungs- und Vorschaufarbe": "Calculation and preview color",
+"Panelfarben im Profil": "Panel colors in the profile",
+"Panelreferenz": "Panel reference",
+"Hinterlegte, unnormalisierte Referenzfarben. Die Bildschirmdarstellung ist eine Näherung.": "Stored, unnormalized reference colors. Their appearance on screen is approximate.",
+"Für die Bildkonvertierung relativ normalisiert lassen. Unnormalisierte Werte dienen vor allem Mess- und Modellvergleichen.": "Keep relative normalization enabled for image conversion. Unnormalized values are mainly for measurement and model comparisons.",
+"Ein Farbprofil berücksichtigt die tatsächlichen Pigmentfarben des Displays. Das Displaygelb kann zum Beispiel dunkler und rötlicher sein als reines Gelb auf einem Vollfarbbildschirm. Der Konverter berücksichtigt das bei der Berechnung der Farbmischungen.": "A color profile accounts for the actual pigment colors of the display. For example, its yellow may be darker and more reddish than pure yellow on a full-color screen. The converter takes this into account when calculating color mixtures."
 };
   if (typeof module !== "undefined") module.exports = messages;
   else (root.ToolboxLocales ||= {}).en = messages;
@@ -2503,15 +2604,16 @@ function getImageDataFromImage(idOrElement){
  'use strict';
  function prepare(palette,{maxColors=2,biases=[],toLab}={}){
   if(!Number.isInteger(maxColors)||maxColors<1||maxColors>4)throw Error('maxColors: 1–4');
-  const limit=Math.min(maxColors,palette.length),candidates=[],unique=new Set();
+  const limit=Math.min(maxColors,palette.length),candidates=[],unique=new Map(),pureCandidates=new Map();
   function add(indices){
    const rgb=[0,1,2].map(k=>indices.reduce((sum,i)=>sum+palette[i][k],0)/indices.length),key=rgb.map(v=>v.toFixed(5)).join(',');
-   if(unique.has(key))return;unique.add(key);
+   if(unique.has(key)){if(indices.length===1)pureCandidates.set(rgb.join(','),unique.get(key));return;}
+   unique.set(key,candidates.length);if(indices.length===1)pureCandidates.set(rgb.join(','),candidates.length);
    candidates.push({indices,rgb,lab:toLab(rgb),bias:indices.reduce((sum,i)=>sum+(biases[i]||0),0)/indices.length*650/19.5075});
   }
   function visit(start,indices,size){if(indices.length===size){add(indices);return;}for(let i=start;i<=palette.length-(size-indices.length);i++)visit(i+1,indices.concat(i),size);}
   for(let size=1;size<=limit;size++)visit(0,[],size);
-  const exact=new Map();if(!biases.some(Boolean))palette.forEach((rgb,i)=>exact.set(rgb.join(','),i));
+  const exact=biases.some(Boolean)?new Map():pureCandidates;
   const cache=new Int16Array(32768);cache.fill(-1);
   function choose(rgb){
    const pure=exact.get(rgb.join(','));if(pure!==undefined)return pure;
@@ -2526,6 +2628,203 @@ function getImageDataFromImage(idOrElement){
   return {candidates,choose,index};
  }
  root.FixedMix={prepare};if(typeof module!=='undefined')module.exports=root.FixedMix;
+})(typeof window!=='undefined'?window:globalThis);
+
+</script>
+<script>
+/* sRGB/XYZ/CIELAB and Bradford adaptation. No DOM or image I/O.
+   Reference: https://www.w3.org/TR/css-color-4/#color-conversion-code */
+(function(root){
+ 'use strict';
+ const whites={D65:[.95047,1,1.08883],D50:[.96422,1,.82521]};
+ const matrix=(m,v)=>m.map(row=>row.reduce((s,x,i)=>s+x*v[i],0));
+ const xyzRGB=[[3.2404542,-1.5371385,-.4985314],[-.969266,1.8760108,.041556],[.0556434,-.2040259,1.0572252]];
+ const rgbXYZ=[[.4124564,.3575761,.1804375],[.2126729,.7151522,.072175],[.0193339,.119192,.9503041]];
+ const bradford=[[.8951,.2664,-.1614],[-.7502,1.7135,.0367],[.0389,-.0685,1.0296]];
+ const inverseBradford=[[.9869929,-.1470543,.1599627],[.4323053,.5183603,.0492912],[-.0085287,.0400428,.9684867]];
+ const clamp=(v,min=0,max=1)=>Math.max(min,Math.min(max,v));
+ const decode=v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4;
+ const encode=v=>v<=.0031308?12.92*v:1.055*v**(1/2.4)-.055;
+ const fromHex=hex=>hex.slice(1).match(/../g).map(v=>parseInt(v,16)/255);
+ function toHex(linear){return '#'+linear.map(v=>Math.round(clamp(encode(v))*255).toString(16).padStart(2,'0')).join('');}
+ function adapt(xyz,from,to=whites.D65){
+  if(from.every((v,i)=>Math.abs(v-to[i])<1e-10))return xyz.slice();
+  const a=matrix(bradford,from),b=matrix(bradford,to);if(a.some(v=>Math.abs(v)<1e-10))throw Error('Invalid adaptation white');
+  return matrix(inverseBradford,matrix(bradford,xyz).map((v,i)=>v*b[i]/a[i]));
+ }
+ function labToXYZ([L,a,b],white=whites.D65){
+  const f=(L+16)/116,undo=v=>v**3>216/24389?v**3:(116*v-16)/(24389/27);
+  return [f+a/500,f,f-b/200].map((v,i)=>undo(v)*white[i]);
+ }
+ function xyzToLab(xyz,white=whites.D65){
+  const f=xyz.map((v,i)=>{const t=v/white[i];return t>216/24389?Math.cbrt(t):((24389/27)*t+16)/116;});
+  return [116*f[1]-16,500*(f[0]-f[1]),200*(f[1]-f[2])];
+ }
+ const rgbToXYZ=hex=>matrix(rgbXYZ,fromHex(hex).map(decode));
+ const linearFromLab=lab=>matrix(xyzRGB,labToXYZ(lab));
+ function labHex(lab,whitePoint='D65'){return toHex(matrix(xyzRGB,adapt(labToXYZ(lab,whites[whitePoint]),whites[whitePoint])));}
+ function fitChroma(lab){
+  const inside=linear=>linear.every(v=>v>=-1e-7&&v<=1+1e-7);if(inside(linearFromLab(lab)))return lab.slice();
+  let low=0,high=1;
+  for(let n=0;n<28;n++){const mid=(low+high)/2;if(inside(linearFromLab([lab[0],lab[1]*mid,lab[2]*mid])))low=mid;else high=mid;}
+  return [lab[0],lab[1]*low,lab[2]*low];
+ }
+ function normalize(profile){
+  const white=profile.nominal.indexOf('#ffffff'),black=profile.nominal.indexOf('#000000');
+  const fallback={available:false,colors:profile.renderColors.slice(),gamutReduced:false,labs:null,adaptedLabs:null};
+  if(white<0||black<0)return fallback;
+  const source=profile.sourceLab,xyz=source?source.values.map(lab=>adapt(labToXYZ(lab,whites[source.whitePoint]),whites[source.whitePoint])):profile.renderColors.map(rgbToXYZ);
+  const wp=xyz[white],Y=wp[1];if(Y<1e-6)return fallback;
+  const adapted=xyz.map(c=>xyzToLab(adapt(c,wp.map(v=>v/Y))));
+  const min=adapted[black][0],max=adapted[white][0];if(max-min<1e-3)return fallback;
+  let gamutReduced=false;
+  const labs=adapted.map((lab,i)=>{
+   if(i===white)return [100,0,0];if(i===black)return [0,0,0];
+   const target=[clamp((lab[0]-min)/(max-min),0,1)*100,lab[1],lab[2]],fitted=fitChroma(target);
+   if(Math.hypot(fitted[1],fitted[2])+1e-5<Math.hypot(target[1],target[2]))gamutReduced=true;
+   return fitted;
+  });
+  const colors=labs.map(lab=>toHex(linearFromLab(lab)));colors[white]='#ffffff';colors[black]='#000000';
+  // Exact ideal endpoints imply no relative change for an sRGB-only profile.
+  if(!source&&profile.renderColors[white]==='#ffffff'&&profile.renderColors[black]==='#000000')return {available:true,colors:profile.renderColors.slice(),gamutReduced:false,labs:adapted,adaptedLabs:adapted};
+  return {available:true,colors,gamutReduced,labs,adaptedLabs:adapted};
+ }
+ function references(profile,mode='relative'){
+  const source=profile.sourceLab,raw=source?source.values.map(lab=>adapt(labToXYZ(lab,whites[source.whitePoint]),whites[source.whitePoint])):profile.renderColors.map(rgbToXYZ);
+  const white=profile.nominal.indexOf('#ffffff'),black=profile.nominal.indexOf('#000000');
+  if(mode==='raw'||white<0||black<0)return {xyz:raw,available:false};
+  const w=raw[white];if(w[1]<1e-6)return {xyz:raw,available:false};
+  const aligned=raw.map(v=>adapt(v,w.map(x=>x/w[1]))),hi=aligned[white],lo=aligned[black];
+  if(hi.some((v,k)=>v-lo[k]<1e-6))return {xyz:raw,available:false};
+  const xyz=aligned.map(v=>v.map((x,k)=>(x-lo[k])/(hi[k]-lo[k])*whites.D65[k]));xyz[white]=whites.D65.slice();xyz[black]=[0,0,0];
+  return {xyz,available:true};
+ }
+ const api={whites,matrix,adapt,labToXYZ,xyzToLab,rgbToXYZ,labHex,fitChroma,normalize,references};root.Colorimetry=api;if(typeof module!=='undefined')module.exports=api;
+})(typeof window!=='undefined'?window:globalThis);
+
+</script>
+<script>
+/* Optional, empirical root-XYZ mixture model. Nominal output bytes stay unchanged.
+   A power mean approximates fine-raster darkening; not a spectral panel model. */
+(function(root){
+ 'use strict';
+ const C=root.Colorimetry||(typeof module!=='undefined'?require('./colorimetry.js'):null);
+ const F=root.FixedMix||(typeof module!=='undefined'?require('./fixed-mix.js'):null);
+ const RGBXYZ=[[.4124564,.3575761,.1804375],[.2126729,.7151522,.072175],[.0193339,.119192,.9503041]],XYZRGB=[[3.2404542,-1.5371385,-.4985314],[-.969266,1.8760108,.041556],[.0556434,-.2040259,1.0572252]];
+ const signed=(v,p)=>Math.sign(v)*Math.abs(v)**p,clamp=v=>Math.max(0,Math.min(255,v));
+ const decode=v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4,encode=v=>v<=.0031308?12.92*v:1.055*Math.max(0,v)**(1/2.4)-.055;
+ function validate(model,count){
+  if(!model||!Number.isFinite(model.exponent)||model.exponent<1||model.exponent>3||!Array.isArray(model.xyz)||model.xyz.length!==count||model.xyz.some(v=>!Array.isArray(v)||v.length!==3||v.some(n=>!Number.isFinite(n)||Math.abs(n)>8)))throw Error('Invalid reflectance model.');
+  return model;
+ }
+ const forward=(xyz,n)=>xyz.map((v,k)=>signed(v/C.whites.D65[k],1/n)*255);
+ const inverse=(v,n)=>v.map((x,k)=>signed(x/255,n)*C.whites.D65[k]);
+ const rgbXYZ=c=>C.matrix(RGBXYZ,c.map(v=>decode(v/255)));
+ const screen=xyz=>C.matrix(XYZRGB,xyz).map(v=>clamp(Math.round(encode(v)*255)));
+ const dot=(a,b)=>a.reduce((s,v,k)=>s+v*b[k],0),sub=(a,b)=>a.map((v,k)=>v-b[k]),dist=(a,b)=>dot(sub(a,b),sub(a,b));
+ const cross=(a,b,c)=>(b[0]-a[0])*(c[2]-a[2])-(b[2]-a[2])*(c[0]-a[0]);
+ // Use mixture coordinates for an affine-independent palette (a simplex).
+ // Euclidean XYZ distance can select a vertex outside the target's gamut face,
+ // creating a one-sided residual that takes many scanlines to suppress.
+ function mixtureCoordinates(palette){
+  const size=palette.length-1;if(size<1||size>3)return null;
+  const axes=palette.slice(1).map(p=>sub(p,palette[0])),gram=axes.map(a=>axes.map(b=>dot(a,b))),scale=Math.max(...gram.flat().map(Math.abs));
+  if(!(scale>0))return null;
+  const rows=gram.map((row,i)=>row.concat(Array.from({length:size},(_,j)=>Number(i===j))));
+  for(let col=0;col<size;col++){
+   let pivot=col;for(let j=col+1;j<size;j++)if(Math.abs(rows[j][col])>Math.abs(rows[pivot][col]))pivot=j;
+   if(Math.abs(rows[pivot][col])<scale*1e-10)return null;
+   [rows[col],rows[pivot]]=[rows[pivot],rows[col]];
+   const divisor=rows[col][col];rows[col]=rows[col].map(v=>v/divisor);
+   for(let j=0;j<size;j++)if(j!==col){const factor=rows[j][col];rows[j]=rows[j].map((v,k)=>v-factor*rows[col][k]);}
+  }
+  const inverse=rows.map(row=>row.slice(size));
+  return color=>{const delta=sub(color,palette[0]),rhs=axes.map(a=>dot(a,delta)),weights=inverse.map(row=>dot(row,rhs));return [1-weights.reduce((s,v)=>s+v,0),...weights];};
+ }
+ // Closest chromaticity at fixed working-space Y. No monitor-gamut clipping.
+ function projector(palette){
+  const low=Math.min(...palette.map(p=>p[1])),high=Math.max(...palette.map(p=>p[1]));
+  return color=>{
+   const Y=Math.max(low,Math.min(high,color[1])),points=[];
+   for(let i=0;i<palette.length;i++){
+    const a=palette[i];if(Math.abs(a[1]-Y)<1e-8)points.push([a[0],Y,a[2]]);
+    for(let j=i+1;j<palette.length;j++){const b=palette[j],dy=b[1]-a[1];if(Math.abs(dy)<1e-10)continue;const t=(Y-a[1])/dy;if(t>=0&&t<=1)points.push(a.map((v,k)=>v+(b[k]-v)*t));}
+   }
+   points.sort((a,b)=>a[0]-b[0]||a[2]-b[2]);const unique=points.filter((p,i)=>!i||dist(p,points[i-1])>1e-14);
+   if(unique.length===1)return unique[0].slice();
+   const lower=[],upper=[];
+   for(const p of unique){while(lower.length>1&&cross(lower.at(-2),lower.at(-1),p)<=1e-9)lower.pop();lower.push(p);}
+   for(const p of unique.slice().reverse()){while(upper.length>1&&cross(upper.at(-2),upper.at(-1),p)<=1e-9)upper.pop();upper.push(p);}
+   const hull=lower.slice(0,-1).concat(upper.slice(0,-1)),p=[color[0],Y,color[2]];
+   if(hull.length>=3&&hull.every((a,i)=>cross(a,hull[(i+1)%hull.length],p)>=-1e-7))return p;
+   let best=hull[0],bestD=dist(p,best);
+   for(let i=0;i<hull.length;i++){const a=hull[i],b=hull[(i+1)%hull.length],ab=sub(b,a),length=dot(ab,ab),t=length?Math.max(0,Math.min(1,dot(sub(p,a),ab)/length)):0,q=a.map((v,k)=>v+ab[k]*t),d=dist(p,q);if(d<bestD){best=q;bestD=d;}}
+   return best.slice();
+  };
+ }
+ function quantize(data,width,height,colors,options,corrected){
+  const model=validate(options.reflectance,colors.length),n=model.exponent,nominal=colors.map(c=>c.slice(1).match(/../g).map(v=>parseInt(v,16))),palette=model.xyz.map(v=>forward(v,n)),labs=model.xyz.map(v=>C.xyzToLab(v));
+  const {dither='none',strength=1,biases=[]}=options,count=width*height,indices=new Uint8Array(count),out=new Uint8ClampedArray(data.length),work=new Float32Array(count*3),baseIndices=new Uint8Array(count),forced=new Int16Array(count);forced.fill(-1);
+  const exact=options.exactNominal?new Map(nominal.map((c,i)=>[c.join(','),i])):null,project=projector(palette),memo=new Map(),diffuse=['floyd','ordered'].includes(dither)&&strength>0;
+  const nearestLab=lab=>{let best=Infinity,index=0;for(let i=0;i<labs.length;i++){const d=dist(lab,labs[i])-(biases[i]||0)*650/19.5075;if(d<best){best=d;index=i;}}return index;};
+  const mixture=mixtureCoordinates(palette);
+  const nearestRoot=c=>{
+   const weights=mixture?.(c);let best=Infinity,index=0;
+   for(let i=0;i<palette.length;i++){
+    // Nearest one-hot mixture is the largest (signed) mixture coefficient.
+    // Keep residuals signed; clipping them would shift the average color.
+    const d=(weights?-2*255**2*weights[i]:dist(c,palette[i]))-(biases[i]||0)*650*strength;
+    if(d<best){best=d;index=i;}
+   }return index;
+  };
+  for(let p=0;p<count;p++){
+   const c=[corrected[p*3],corrected[p*3+1],corrected[p*3+2]],key=c.join(',');let sample=memo.get(key);
+   if(!sample){const xyz=rgbXYZ(c),base=dither==='fixed'?0:nearestLab(C.xyzToLab(xyz)),v=forward(xyz,n);sample={base,mapped:diffuse?project(v):v};if(memo.size<65536)memo.set(key,sample);}
+   baseIndices[p]=sample.base;const literal=exact?.get(key);if(literal!==undefined)forced[p]=literal;
+   const v=sample.mapped;
+   work.set(diffuse&&strength<1?v.map((x,k)=>palette[sample.base][k]+(x-palette[sample.base][k])*strength):v,p*3);
+  }
+  const toLab=v=>C.xyzToLab(inverse(v,n));
+  if(dither==='fixed'){
+   const fixed=F.prepare(palette,{maxColors:options.mixColors??2,biases,toLab});
+   for(let y=0;y<height;y++)for(let x=0;x<width;x++){const p=y*width+x,v=[...work.subarray(p*3,p*3+3)],i=forced[p]>=0?forced[p]:fixed.index(fixed.choose(v),x,y);indices[p]=i;out.set(nominal[i],p*4);out[p*4+3]=data[p*4+3];}
+   return {data:out,indices,width,height};
+  }
+  const bayer=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5],tiles=new Map();
+  function ordered(v,rank){
+   // Cached tiles must use the cache cell's canonical target, not whichever
+   // pixel happened to populate it first. Mixture bins also retain gamut faces.
+   const bins=mixture?mixture(v).map(x=>Math.max(0,Math.round(x*31))):v.map(x=>Math.round(x*31/255)),key=bins.join(',');let tile=tiles.get(key);
+   if(!tile){const total=bins.reduce((s,v)=>s+v,0),target=mixture?[0,1,2].map(k=>palette.reduce((s,c,i)=>s+c[k]*bins[i]/total,0)):project(bins.map(x=>x*255/31)),sum=[0,0,0];tile=[];
+    for(let i=0;i<16;i++){const q=nearestRoot(target.map((x,k)=>x*(i+1)-sum[k]));tile.push(q);palette[q].forEach((x,k)=>sum[k]+=x);}
+    for(let i=0;i<16;i++){const old=palette[tile[i]],q=nearestRoot(target.map((x,k)=>x*16-sum[k]+old[k]));tile[i]=q;palette[q].forEach((x,k)=>sum[k]+=x-old[k]);}
+    tile.sort((a,b)=>palette[a][1]-palette[b][1]||a-b);if(tiles.size<32768)tiles.set(key,tile);}
+   return tile[rank];
+  }
+  for(let y=0;y<height;y++)for(let scan=0;scan<width;scan++){
+   const dir=dither==='floyd'&&y%2?-1:1,x=dir<0?width-1-scan:scan,p=y*width+x,v=[...work.subarray(p*3,p*3+3)];
+   let i=forced[p]>=0?forced[p]:dither==='none'||strength===0?baseIndices[p]:dither==='ordered'?ordered(v,bayer[(y%4)*4+x%4]):nearestRoot(v);
+   indices[p]=i;out.set(nominal[i],p*4);out[p*4+3]=data[p*4+3];
+   if(dither==='floyd'&&strength>0&&data[p*4+3]){
+    const neighbors=[[dir,0,7],[-dir,1,3],[0,1,5],[dir,1,1]].filter(([dx,dy])=>x+dx>=0&&x+dx<width&&y+dy<height&&data[((y+dy)*width+x+dx)*4+3]);
+    const total=neighbors.reduce((s,p)=>s+p[2],0);for(const [dx,dy,w]of neighbors){const q=((y+dy)*width+x+dx)*3;for(let k=0;k<3;k++)work[q+k]+=(v[k]-palette[i][k])*w/total;}
+   }
+  }
+  return {data:out,indices,width,height};
+ }
+ // Native-resolution spatial preview: average in model coordinates, invert the
+ // empirical response, then encode to the monitor. Export data is never touched.
+ function preview(data,width,height,colors,model,radius=0){
+  if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||width>4096||height>4096||width*height>4000000||!data||data.length!==width*height*4||!Number.isFinite(radius)||radius<0||radius>4||!Array.isArray(colors)||colors.length<2||colors.length>16||colors.some(c=>typeof c!=='string'||!/^#[0-9a-f]{6}$/i.test(c)))throw Error('Invalid reflectance preview.');
+  validate(model,colors.length);const palette=model.xyz.map(v=>forward(v,model.exponent)),pack=c=>(c[0]<<16)|(c[1]<<8)|c[2],lookup=new Map(colors.map((c,i)=>[parseInt(c.slice(1),16),palette[i]]));
+  let work=new Float32Array(width*height*4);
+  for(let p=0;p<width*height;p++){const rgb=[data[p*4],data[p*4+1],data[p*4+2]],v=lookup.get(pack(rgb))||forward(rgbXYZ(rgb),model.exponent),a=data[p*4+3]/255;for(let k=0;k<3;k++)work[p*4+k]=v[k]*a;work[p*4+3]=a;}
+  if(radius>0){const reach=Math.ceil(radius*3),weights=Array.from({length:reach*2+1},(_,i)=>Math.exp(-((i-reach)**2)/(2*radius*radius))),sum=weights.reduce((a,b)=>a+b);weights.forEach((v,i)=>weights[i]=v/sum);
+   for(const vertical of [false,true]){const next=new Float32Array(work.length);for(let y=0;y<height;y++)for(let x=0;x<width;x++)for(let d=-reach;d<=reach;d++){const xx=vertical?x:Math.max(0,Math.min(width-1,x+d)),yy=vertical?Math.max(0,Math.min(height-1,y+d)):y,p=(y*width+x)*4,q=(yy*width+xx)*4;for(let k=0;k<4;k++)next[p+k]+=work[q+k]*weights[d+reach];}work=next;}
+  }
+  const out=new Uint8ClampedArray(data.length);for(let p=0;p<width*height;p++){const a=work[p*4+3];if(a>1e-8)out.set(screen(inverse([work[p*4]/a,work[p*4+1]/a,work[p*4+2]/a],model.exponent)),p*4);out[p*4+3]=a*255;}return out;
+ }
+ const api={validate,forward,inverse,screen,projector,mixtureCoordinates,quantize,preview};root.Reflectance=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
 
 </script>
@@ -2561,9 +2860,21 @@ function getImageDataFromImage(idOrElement){
     if (!Number.isInteger(w) || !Number.isInteger(h) || w < 1 || h < 1 || w > 4096 || h > 4096 || w * h > 4000000)
       throw Error(t('Abmessungen: 1–4096 px, insgesamt höchstens 4 Millionen Pixel.'));
   }
+  function renderPalette(colors, renderColors) {
+    if (renderColors === undefined) return colors.map(rgb);
+    if (!Array.isArray(renderColors) || renderColors.length !== colors.length || renderColors.some(c => typeof c !== 'string' || !/^#[0-9a-f]{6}$/i.test(c)))
+      throw Error('renderColors: one #RRGGBB value per output color required.');
+    return renderColors.map(rgb);
+  }
   function quantize(data, width, height, colors, options = {}) {
     dimensions(width, height);
-    const palette = colors.map(rgb), indices = new Uint8Array(width * height);
+    const outputPalette = colors.map(rgb), profilePalette = renderPalette(colors, options.renderColors);
+    // Continuous preparation is left to the AP; profiles apply to local quantization.
+    const palette = ['rgb','gamut'].includes(options.dither) ? outputPalette : profilePalette;
+    // Explicit drawing colors retain their selected output index. Inserted image
+    // intermediate colors still use the profile, while source photos do not opt in.
+    const exactNominal=options.exactNominal?new Map(outputPalette.map((c,i)=>[c.join(','),i])):null;
+    const indices = new Uint8Array(width * height);
     const out = new Uint8ClampedArray(data.length), work = new Float32Array(width * height * 3);
     const {brightness = 0, contrast = 1, saturation = 1, threshold = 128, dither = 'none', strength = 1, biases = []} = options;
     for (let p = 0; p < indices.length; p++) {
@@ -2581,11 +2892,12 @@ function getImageDataFromImage(idOrElement){
       }
       return {data:out,indices,width,height,continuous:true};
     }
+    if(options.reflectance){const renderer=root.Reflectance||(typeof module!=='undefined'?require('./reflectance.js'):null);return renderer.quantize(data,width,height,colors,options,work);}
     if(dither==='fixed'){
       const mixing=fixedMix.prepare(palette,{maxColors:options.mixColors??2,biases,toLab:rgbToLab});
       for(let y=0;y<height;y++)for(let x=0;x<width;x++){
         const p=y*width+x,mix=mixing.choose([work[p*3],work[p*3+1],work[p*3+2]]),chosen=mixing.index(mix,x,y);
-        indices[p]=chosen;out.set(palette[chosen],p*4);out[p*4+3]=data[p*4+3];
+        indices[p]=chosen;out.set(outputPalette[chosen],p*4);out[p*4+3]=data[p*4+3];
       }
       return {data:out,indices,width,height};
     }
@@ -2652,10 +2964,10 @@ function getImageDataFromImage(idOrElement){
       const p = y * width + x;
       const c = [work[p*3], work[p*3+1], work[p*3+2]];
       // The same perceptual decision is used at every strength and in every mode.
-      let chosen = nearestPerceptual(c, dither === 'floyd' && strength > 0 ? strength : 1);
+      let chosen = exactNominal?.get(c.join(',')) ?? nearestPerceptual(c, dither === 'floyd' && strength > 0 ? strength : 1);
       if (dither === 'ordered') chosen = orderedColor(c, chosen, bayer[(y%4)*4+x%4]);
       indices[p] = chosen;
-      for (let k = 0; k < 3; k++) out[p * 4 + k] = palette[chosen][k];
+      for (let k = 0; k < 3; k++) out[p * 4 + k] = outputPalette[chosen][k];
       out[p * 4 + 3] = data[p * 4 + 3];
       if (dither === 'floyd' && strength > 0 && data[p * 4 + 3]) {
         for (const [dx, dy, weight] of [[1, 0, 7], [-1, 1, 3], [0, 1, 5], [1, 1, 1]]) {
@@ -2666,7 +2978,7 @@ function getImageDataFromImage(idOrElement){
     }
     return {data: out, indices, width, height};
   }
-  root.OEPLImage = {version:'1.0.0',palettes,rgb,rgbToLab,dimensions,quantize};
+  root.OEPLImage = {version:'1.0.0',palettes,rgb,rgbToLab,dimensions,renderPalette,quantize};
   if(typeof module!=='undefined')module.exports=root.OEPLImage;
 })(typeof window!=='undefined'?window:globalThis);
 
@@ -2753,11 +3065,82 @@ function getImageDataFromImage(idOrElement){
 
 </script>
 <script>
+/* Physical color references are separate from the nominal wire/export palette. */
+(function(root){
+ 'use strict';
+ const hex=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);
+ const colorimetry=root.Colorimetry||(typeof module!=='undefined'?require('./colorimetry.js'):null);
+ function validate(value){
+  if(!value||typeof value!=='object'||Array.isArray(value)||typeof value.name!=='string'||!value.name.trim()||value.name.length>80)throw Error('Invalid color profile name.');
+  const {nominal,renderColors}=value;
+  if(!Array.isArray(nominal)||nominal.length<2||nominal.length>16||nominal.some(c=>!hex(c))||new Set(nominal.map(c=>c.toLowerCase())).size!==nominal.length||!Array.isArray(renderColors)||renderColors.length!==nominal.length||renderColors.some(c=>!hex(c)))throw Error('Invalid color profile palette.');
+  if(value.source!==undefined&&(typeof value.source!=='string'||value.source.length>600))throw Error('Invalid color profile source.');
+  if(value.kind!==undefined&&!['approximate','measured','manufacturer'].includes(value.kind))throw Error('Invalid color profile kind.');
+  if(value.normalization!==undefined&&!['relative','raw'].includes(value.normalization))throw Error('Invalid profile normalization.');
+  let sourceLab,mixing;
+  if(value.mixing!==undefined){if(!value.mixing||value.mixing.model!=='power-xyz'||!Number.isFinite(value.mixing.exponent)||value.mixing.exponent<1||value.mixing.exponent>3)throw Error('Invalid mixture model.');mixing={model:'power-xyz',exponent:value.mixing.exponent};}
+  if(value.sourceLab!==undefined){
+   const lab=value.sourceLab;
+   if(!lab||!['D50','D65'].includes(lab.whitePoint)||typeof lab.assumedWhitePoint!=='boolean'||!Array.isArray(lab.values)||lab.values.length!==nominal.length||lab.values.some(v=>!Array.isArray(v)||v.length!==3||v.some(n=>!Number.isFinite(n))||v[0]<0||v[0]>100||Math.abs(v[1])>160||Math.abs(v[2])>160))throw Error('Invalid Lab source data.');
+   sourceLab={whitePoint:lab.whitePoint,assumedWhitePoint:lab.assumedWhitePoint,values:lab.values.map(v=>v.slice())};
+   if(sourceLab.values.some((v,i)=>colorimetry.labHex(v,sourceLab.whitePoint)!==renderColors[i].toLowerCase()))throw Error('Lab source does not match RGB references.');
+  }
+  return {name:value.name.trim(),nominal:nominal.map(c=>c.toLowerCase()),renderColors:renderColors.map(c=>c.toLowerCase()),source:value.source||'',kind:value.kind||'approximate',normalization:value.normalization||'relative',...(sourceLab?{sourceLab}:{}),...(mixing?{mixing}:{})};
+ }
+ const builtins=[];
+ const genericLab=[[68,-1,3],[14,3,-1],[29,41,27],[56,17,74]];
+ builtins.push(validate({name:'BWRY · generische Näherung (feine Raster)',nominal:['#ffffff','#000000','#ff0000','#ffff00'],renderColors:genericLab.map(v=>colorimetry.labHex(v,'D50')),sourceLab:{whitePoint:'D50',assumedWhitePoint:false,values:genericLab},mixing:{model:'power-xyz',exponent:1.8},kind:'approximate',source:'Abgerundete Referenzfarben aus Foto-/Herstellervergleichen; Rasterwirkung aus Kamera-/Scannervergleichen angenähert. Kein universelles Panelprofil.'}));
+ function key(colors){return colors.map(c=>c.toLowerCase()).sort().join(',');}
+ function match(profile,colors){return key(profile.nominal)===key(colors);}
+ function ordered(profile,colors){if(!match(profile,colors))throw Error('Color profile does not match output palette.');const refs=new Map(profile.nominal.map((c,i)=>[c,profile.renderColors[i]]));return colors.map(c=>refs.get(c.toLowerCase()));}
+ const normalizedCache=new WeakMap();
+ function normalization(profile){const key=JSON.stringify([profile.nominal,profile.renderColors,profile.sourceLab,profile.mixing]),cached=normalizedCache.get(profile);if(cached?.key===key)return cached.result;let result;
+  if(profile.mixing){const refs=colorimetry.references(profile),labs=refs.xyz.map(v=>colorimetry.xyzToLab(v));result={available:refs.available,colors:labs.map(v=>colorimetry.labHex(v)),gamutReduced:false,labs,adaptedLabs:labs};}
+  else result=colorimetry.normalize(profile);normalizedCache.set(profile,{key,result});return result;}
+ function effective(profile,colors,mode=profile.normalization||'relative'){
+  if(!['raw','relative'].includes(mode))throw Error('Invalid profile normalization.');
+  if(mode==='raw')return ordered(profile,colors);
+  return ordered({...profile,renderColors:normalization(profile).colors},colors);
+ }
+ function calculation(profile,colors,mode=profile.normalization||'relative'){
+  if(!match(profile,colors))throw Error('Color profile does not match output palette.');
+  if(!['relative','raw'].includes(mode))throw Error('Invalid profile normalization.');
+  const renderColors=effective(profile,colors,mode);
+  if(!profile.mixing)return {renderColors};
+  const refs=colorimetry.references(profile,mode),lookup=new Map(profile.nominal.map((c,i)=>[c,refs.xyz[i]]));
+  return {renderColors,reflectance:{xyz:colors.map(c=>lookup.get(c.toLowerCase()).slice()),exponent:profile.mixing.exponent}};
+ }
+ function fromAP(meta,colors){
+  if(!meta||!meta.perceptual||typeof meta.perceptual!=='object'||Array.isArray(meta.perceptual)||!meta.colortable)return null;
+  const toHex=c=>Array.isArray(c)&&c.length===3&&c.every(v=>Number.isInteger(v)&&v>=0&&v<=255)?'#'+c.map(v=>v.toString(16).padStart(2,'0')).join(''):null;
+  const refs=new Map();
+  for(const [name,value]of Object.entries(meta.colortable)){const nominal=toHex(value);if(!nominal)return null;const perceived=Object.hasOwn(meta.perceptual,name)?toHex(meta.perceptual[name]):nominal;if(!perceived||refs.has(nominal))return null;refs.set(nominal,perceived);}
+  if(refs.size!==colors.length||colors.some(c=>!refs.has(c.toLowerCase())))return null;
+  return validate({name:('AP · '+(typeof meta.name==='string'?meta.name:'Display')).slice(0,80),nominal:colors,renderColors:colors.map(c=>refs.get(c.toLowerCase())),source:'OpenEPaperLink · perceptual',kind:'approximate'});
+ }
+ const cache=new WeakMap();
+ function preview(image,nominal,renderColors,reflectance){
+  if(!renderColors||image.continuous)return image;
+  const signature=JSON.stringify([nominal,renderColors,reflectance]),saved=cache.get(image);if(saved?.signature===signature)return saved.image;
+  if(renderColors.length!==nominal.length||renderColors.some(c=>!hex(c)))throw Error('Invalid preview palette.');
+  if(reflectance){const result={...image,reflectancePreview:{colors:nominal,model:reflectance}};cache.set(image,{signature,image:result});return result;}
+  const rgb=c=>c.slice(1).match(/../g).map(v=>parseInt(v,16)),pack=c=>(c[0]<<16)|(c[1]<<8)|c[2];
+  const refs=new Map(nominal.map((c,i)=>[pack(rgb(c)),rgb(renderColors[i])]));
+  const data=new Uint8ClampedArray(image.data);
+  for(let p=0;p<data.length;p+=4){const c=refs.get((data[p]<<16)|(data[p+1]<<8)|data[p+2]);if(c)data.set(c,p);}
+  const result={...image,data};cache.set(image,{signature,image:result});return result;
+ }
+ const api={validate,builtins,key,match,ordered,normalization,effective,calculation,fromAP,preview};root.ColorProfiles=api;if(typeof module!=='undefined')module.exports=api;
+})(typeof window!=='undefined'?window:globalThis);
+
+</script>
+<script>
 /* Public RGBA interface. Crop/resize first; background composition precedes conversion. */
 (function(root){
  'use strict';
  const engine=root.OEPLImage || (typeof module!=='undefined'?require('./image-converter.js'):null);
  const illustration=root.Illustration||(typeof module!=='undefined'?require('./illustration.js'):null);
+ const colorProfiles=root.ColorProfiles||(typeof module!=='undefined'?require('./color-profiles.js'):null);
  const modes={'none':'none','floyd':'floyd','floyd-steinberg':'floyd','ordered':'ordered','bayer':'ordered','fixed':'fixed','fixed-mix':'fixed','rgb':'rgb','gamut':'gamut'};
  function settings(options={}){
   let palette=options.palette??'BWRY';if(palette==='BWYR')palette='BWRY';
@@ -2772,7 +3155,10 @@ function getImageDataFromImage(idOrElement){
   if(!Number.isInteger(mixColors)||mixColors<1||mixColors>4)throw Error('mixColors: 1–4');
   const biases=options.biases??[];if(!Array.isArray(biases)||biases.length>colors.length||biases.some(v=>!Number.isFinite(v)||Math.abs(v)>100))throw Error('Invalid palette biases.');
   const background=options.background??null;if(background!==null&&(typeof background!=='string'||!/^#[0-9a-f]{6}$/i.test(background)))throw Error('background: null or #RRGGBB');
-  return {colors:[...colors],dither,strength,mixColors,...corrected,biases:[...biases],background,illustration:illustration.settings(options.illustration)};
+  let renderColors=options.renderColors,reflectance;
+  if(options.colorProfile!==undefined){if(renderColors!==undefined)throw Error('Choose colorProfile or renderColors.');const profile=colorProfiles.validate(options.colorProfile),calculation=colorProfiles.calculation(profile,colors);renderColors=calculation.renderColors;reflectance=calculation.reflectance;}
+  engine.renderPalette(colors,renderColors);
+  return {colors:[...colors],dither,strength,mixColors,...corrected,biases:[...biases],background,...(renderColors===undefined?{}:{renderColors:[...renderColors]}),...(reflectance?{reflectance}:{}),illustration:illustration.settings(options.illustration)};
  }
  function convert(options={}){
   const {width,height,data}=options;engine.dimensions(width,height);const config=settings(options);
@@ -2784,7 +3170,8 @@ function getImageDataFromImage(idOrElement){
   const output=engine.quantize(prepared.data,width,height,config.colors,config);
   return illustration.apply(output,prepared,config.colors,config.illustration);
  }
- const api={...engine,version:'1.1.0',illustration,settings,convert};root.OEPLImage=api;if(typeof module!=='undefined')module.exports=api;
+ const reflectance=root.Reflectance||(typeof module!=='undefined'?require('./reflectance.js'):null);
+ const api={...engine,version:'1.4.0',illustration,colorProfiles,reflectance,settings,convert};root.OEPLImage=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
 
 </script>
@@ -2912,6 +3299,124 @@ function getImageDataFromImage(idOrElement){
   root.EP = {palettes, rgb, rgbToLab, dimensions, quantize, cropImage, vlw, rotate, invert, template, readVlw};
   if (typeof module !== 'undefined') module.exports = root.EP;
 })(globalThis);
+
+</script>
+<script>
+/* Local profile management. Selecting a profile changes calculation, not export codes. */
+(function(root){
+ 'use strict';
+ class ColorProfileEditor{
+  constructor({colors,readStore,saveStore,message,onChange,onPreview,download,t}){
+   Object.assign(this,{colors,saveStore,message,onChange,onPreview,download,t});this.$=id=>document.getElementById(id);this.own=Object.create(null);this.ap=null;this.context=null;this.entries=new Map();
+   const stored=readStore('oepl-color-profiles-v1',{});
+   if(stored&&typeof stored==='object'&&!Array.isArray(stored))for(const [name,value]of Object.entries(stored).slice(0,50))try{const p=ColorProfiles.validate(value);if(name===p.name)this.own[name]=p;}catch{}
+   const choices=readStore('oepl-color-profile-choices-v1',{});this.choices=Object.create(null);
+   if(choices&&typeof choices==='object'&&!Array.isArray(choices))for(const [key,value]of Object.entries(choices).slice(0,100))if(key.length<=600&&typeof value==='string'&&value.length<=300)this.choices[key]=value;
+   this.normalizationModes=Object.create(null);const modes=readStore('oepl-profile-normalization-v1',{});
+   if(modes&&typeof modes==='object'&&!Array.isArray(modes))for(const [key,value]of Object.entries(modes).slice(0,100))if(key.length<=600&&['relative','raw'].includes(value))this.normalizationModes[key]=value;
+   if(this.normalizationModes['builtin:bwry-generic']===undefined&&this.normalizationModes['builtin:3']!==undefined)this.normalizationModes['builtin:bwry-generic']=this.normalizationModes['builtin:3'];
+   this.$('profilePreview').value=readStore('oepl-profile-preview-v1','profile')==='ideal'?'ideal':'profile';
+   this.$('colorProfileModel').onchange=()=>{this.$('colorProfileExponent').disabled=this.$('colorProfileModel').value!=='power-xyz';};
+   this.$('colorProfileExponent').ondblclick=()=>{this.$('colorProfileExponent').value='1.8';};
+   this.$('colorProfile').onchange=()=>{this.remember();this.fill();onChange();};
+   this.$('profilePreview').onchange=()=>{saveStore('oepl-profile-preview-v1',this.$('profilePreview').value);onPreview();};
+   this.$('profileNormalization').onchange=()=>{this.normalizationModes[this.modeKey()]=this.$('profileNormalization').value;const keys=Object.keys(this.normalizationModes);if(keys.length>100)delete this.normalizationModes[keys[0]];saveStore('oepl-profile-normalization-v1',this.normalizationModes);this.updateNormalization();onChange();};
+   this.$('saveColorProfile').onclick=()=>this.guard(()=>{
+    const current=this.current(),renderColors=[...this.$('colorProfileRows').querySelectorAll('input[type=text]')].map(i=>i.value.toLowerCase());
+    const unchanged=current&&JSON.stringify(renderColors)===JSON.stringify(ColorProfiles.ordered(current,this.colors()));
+    const sourceLab=unchanged&&current.sourceLab?{...current.sourceLab,values:this.colors().map(c=>current.sourceLab.values[current.nominal.indexOf(c.toLowerCase())])}:undefined;
+    const mixing=this.$('colorProfileModel').value==='power-xyz'?{model:'power-xyz',exponent:Number(this.$('colorProfileExponent').value)}:undefined;
+    const profile=ColorProfiles.validate({name:this.$('colorProfileName').value,source:this.$('colorProfileSource').value,kind:this.$('colorProfileKind').value,nominal:this.colors(),renderColors,normalization:this.$('profileNormalization').value,...(sourceLab?{sourceLab}:{}),...(mixing?{mixing}:{})});
+    if(!Object.hasOwn(this.own,profile.name)&&Object.keys(this.own).length>=50)throw Error('Profile limit');
+    this.own[profile.name]=profile;this.save();this.populate('custom:'+profile.name);this.remember();onChange();message(t('Farbprofil gespeichert und für die Berechnung aktiviert.'));
+   });
+   this.$('deleteColorProfile').onclick=()=>this.guard(()=>{
+    const id=this.$('colorProfile').value;if(!id.startsWith('custom:'))return;
+    delete this.own[id.slice(7)];for(const key of Object.keys(this.choices))if(this.choices[key]===id)delete this.choices[key];this.save();this.populate('ideal');this.remember();onChange();message(t('Eigenes Farbprofil gelöscht.'));
+   });
+   this.$('exportColorProfile').onclick=()=>this.guard(()=>{
+    const profile={...(this.current()||ColorProfiles.validate({name:t('Idealisiert – reine RGB-Farben'),nominal:this.colors(),renderColors:this.colors()})),normalization:this.$('profileNormalization').value};
+    download(new Blob([JSON.stringify({format:'oepl-color-profile',version:1,profile},null,2)],{type:'application/json'}),'oepl-color-profile.json');
+   });
+   this.$('importColorProfile').onchange=async event=>{
+    const file=event.target.files?.[0];if(!file)return;
+    try{
+     if(file.size>32768)throw Error('Profile file too large');
+     const doc=JSON.parse(await file.text());if(doc.format!=='oepl-color-profile'||doc.version!==1)throw Error('Profile format');
+     const profile=ColorProfiles.validate(doc.profile);
+     // Import must not silently switch the selected display palette.
+     if(!ColorProfiles.match(profile,this.colors())){message(t('Das Farbprofil passt nicht zu den gewählten Displayfarben. Bitte zuerst die passende Farbpalette wählen.'),true);return;}
+     if(!Object.hasOwn(this.own,profile.name)&&Object.keys(this.own).length>=50)throw Error('Profile limit');
+     this.own[profile.name]=profile;this.normalizationModes[this.context||'custom:'+profile.name]=profile.normalization;saveStore('oepl-profile-normalization-v1',this.normalizationModes);this.save();this.populate('custom:'+profile.name);this.remember();onChange();message(t('Farbprofil importiert und aktiviert.'));
+    }catch{message(t('Ungültiges Farbprofil. Name, Farben, Herkunft und Dateiformat prüfen (höchstens 50 Profile, 32 KiB je Import).'),true);}
+    finally{event.target.value='';}
+   };
+   document.addEventListener('languagechange',()=>{const selected=this.$('colorProfile').value;this.populate(selected);});
+  }
+  guard(fn){try{fn();}catch{this.message(this.t('Ungültiges Farbprofil. Name, Farben, Herkunft und Dateiformat prüfen (höchstens 50 Profile, 32 KiB je Import).'),true);}}
+  save(){this.saveStore('oepl-color-profiles-v1',this.own);this.saveStore('oepl-color-profile-choices-v1',this.choices);}
+  remember(){const key=this.context||ColorProfiles.key(this.colors());this.choices[key]=this.$('colorProfile').value;const keys=Object.keys(this.choices);if(keys.length>100)delete this.choices[keys[0]];this.saveStore('oepl-color-profile-choices-v1',this.choices);}
+  current(){return this.entries.get(this.$('colorProfile').value)||null;}
+  modeKey(){return this.context||this.$('colorProfile').value;}
+  get calculation(){const p=this.current();return p?ColorProfiles.calculation(p,this.colors(),this.$('profileNormalization').value):{};}
+  get renderColors(){return this.calculation.renderColors;}
+  get previewColors(){return this.$('profilePreview').value==='profile'?this.renderColors:undefined;}
+  get previewReflectance(){return this.$('profilePreview').value==='profile'?this.calculation.reflectance:undefined;}
+  populate(selected){
+   const select=this.$('colorProfile'),colors=this.colors();this.entries=new Map();select.replaceChildren(new Option(this.t('Idealisiert – reine RGB-Farben'),'ideal'));
+   const add=(id,p)=>{if(ColorProfiles.match(p,colors)){this.entries.set(id,p);const option=new Option(this.t(p.name),id);option.title=this.t(p.name);select.append(option);}};
+   // Stable identifier: removing old presets must not reinterpret builtin:0.
+   ColorProfiles.builtins.forEach(p=>add('builtin:bwry-generic',p));for(const [name,p]of Object.entries(this.own))add('custom:'+name,p);if(this.ap)add('ap',this.ap);
+   const choice=selected??this.choices[this.context||ColorProfiles.key(colors)]??'ideal';const resolved=choice==='builtin:3'?'builtin:bwry-generic':choice;select.value=this.entries.has(resolved)?resolved:'ideal';this.fill();
+  }
+  paletteChanged(){const current=this.current(),selected=this.$('colorProfile').value,key=ColorProfiles.key(this.colors());if(this.nominalKey!==key)this.context=null;this.nominalKey=key;if(this.ap&&!ColorProfiles.match(this.ap,this.colors()))this.ap=null;this.populate(current&&ColorProfiles.match(current,this.colors())?selected:undefined);}
+  applyAP(meta,context){this.context=context||null;this.ap=ColorProfiles.fromAP(meta,this.colors());const previous=this.context?this.choices[this.context]:undefined;this.populate(previous??(this.ap?'ap':'ideal'));}
+  clearAP(){const selected=this.$('colorProfile').value;this.context=null;this.ap=null;this.populate(selected==='ap'?'ideal':selected);}
+  fill(){
+   const p=this.current(),refs=p?ColorProfiles.ordered(p,this.colors()):this.colors(),$=this.$,t=this.t;
+   $('profileNormalization').value=this.normalizationModes[this.modeKey()]||p?.normalization||'relative';
+   const info=$('colorProfileInfo');info.replaceChildren();
+   if(!p)info.textContent=t('Bisherige Berechnung mit idealen RGB-Farben.');
+   else{
+    info.append(t(({approximate:'Näherung',measured:'Eigene Messung',manufacturer:'Herstellerangabe'})[p.kind]));
+    if(p.source){info.append(' · ');if(/^https?:\/\//i.test(p.source)){const link=document.createElement('a');link.href=p.source;link.textContent=t('Quelle');link.title=p.source;link.target='_blank';link.rel='noopener noreferrer';info.append(link);}else info.append(p.source);}
+   }
+   $('colorProfileName').value=p?.name||'';$('colorProfileSource').value=p?.source||'';$('colorProfileKind').value=p?.kind||'approximate';$('deleteColorProfile').disabled=!$('colorProfile').value.startsWith('custom:');
+   $('colorProfileModel').value=p?.mixing?'power-xyz':'legacy';$('colorProfileExponent').value=String(p?.mixing?.exponent??1.8);$('colorProfileExponent').disabled=!p?.mixing;
+   $('colorProfileRows').replaceChildren();this.colors().forEach((color,i)=>{
+    const row=document.createElement('div');row.className='colorProfileRow';const label=document.createElement('label'),name=document.createElement('span'),swatch=document.createElement('input'),hex=document.createElement('input');
+    name.textContent=ColorInfo.label(color);swatch.type='color';swatch.value=refs[i];swatch.setAttribute('aria-label',t('Profilfarbe für {color}',{color:ColorInfo.label(color)}));hex.type='text';hex.value=refs[i];hex.maxLength=7;hex.pattern='#[0-9a-fA-F]{6}';hex.setAttribute('aria-label',t('RGB-Wert für {color}',{color:ColorInfo.label(color)}));
+    swatch.oninput=()=>{hex.value=swatch.value;hex.setCustomValidity('');};hex.oninput=()=>{const valid=/^#[0-9a-f]{6}$/i.test(hex.value);hex.setCustomValidity(valid?'':t('Bitte #RRGGBB eingeben.'));if(valid)swatch.value=hex.value;};
+    label.append(name,hex);row.append(label,swatch);$('colorProfileRows').append(row);
+    const effective=document.createElement('span');effective.className='profileEffectiveColor';row.append(effective);
+   });
+   this.showPanelReferences(p,refs);this.updateNormalization();
+  }
+  showPanelReferences(profile,refs){
+   const container=this.$('panelReferenceComparison'),t=this.t;container.replaceChildren();container.hidden=!profile;if(!profile)return;
+   const table=document.createElement('table'),caption=document.createElement('caption');caption.textContent=t('Panelfarben im Profil');table.append(caption);
+   const head=document.createElement('thead'),header=document.createElement('tr');
+   for(const title of ['',t('Idealisiert'),t('Panelreferenz')]){const th=document.createElement('th');th.scope='col';th.textContent=title;header.append(th);}head.append(header);table.append(head);
+   const body=document.createElement('tbody');this.colors().forEach((color,i)=>{
+    const row=document.createElement('tr'),name=document.createElement('th');name.scope='row';name.textContent=ColorInfo.code(color);name.title=ColorInfo.label(color);row.append(name);
+    for(const value of [color,refs[i]]){
+     const cell=document.createElement('td'),swatch=document.createElement('span');swatch.className='panelReferenceSwatch';swatch.style.backgroundColor=value;swatch.textContent=value;swatch.style.color=ColorInfo.brightness(value)<.5?'#ffffff':'#000000';cell.append(swatch);row.append(cell);
+    }body.append(row);
+   });table.append(body);container.append(table);
+   const hint=document.createElement('p');hint.className='hint';hint.textContent=t('Hinterlegte, unnormalisierte Referenzfarben. Die Bildschirmdarstellung ist eine Näherung.');container.append(hint);
+  }
+  updateNormalization(){
+   const p=this.current(),report=p?ColorProfiles.normalization(p):null,$=this.$,t=this.t;
+   $('profileNormalization').disabled=!p||!report.available;
+   $('profileWhitePointHint').hidden=!p?.sourceLab?.assumedWhitePoint;
+   $('normalizationInfo').textContent=!p?t('Idealisiert: keine zusätzliche Normalisierung.'):!report.available?t('Normalisierung benötigt unterschiedliche Referenzwerte für Weiß und Schwarz. Die Originalwerte bleiben aktiv.'):$('profileNormalization').value==='raw'?t('Unnormalisierte Referenzfarben für Berechnung und Profilvorschau.'):t('Panelweiß → Weiß, Panelschwarz → Schwarz; gemeinsame Helligkeitsabbildung, Farbton bezogen auf Panelweiß erhalten.')+(report.gamutReduced?' '+t('Sättigung bei Bedarf auf sRGB begrenzt.'): '');
+   if(p?.mixing)$('normalizationInfo').textContent=t('Reflexionsmodell: Vollfarben und Rasterwirkung getrennt. XYZ-Rechenwerte bleiben unbeschnitten; RGB-Werte dienen nur der Vorschau.')+' '+t('Rasterexponent: {value}',{value:p.mixing.exponent});
+   const colors=this.renderColors||this.colors();$('colorProfileRows').querySelectorAll('.profileEffectiveColor').forEach((node,i)=>{node.style.setProperty('--effective-color',colors[i]);node.textContent=t(p?.mixing?'Vorschau: {color}':'Wirksam: {color}',{color:colors[i]});node.title=t(p?.mixing?'Nur Bildschirmdarstellung der Rechenreferenz':'Berechnungs- und Vorschaufarbe');});
+  }
+  continuous(value){this.$('profileContinuousHint').hidden=!value;this.$('profilePreview').disabled=value;}
+ }
+ root.ColorProfileEditor=ColorProfileEditor;
+})(window);
 
 </script>
 <script>
@@ -3482,7 +3987,8 @@ function getImageDataFromImage(idOrElement){
 (function(root){
  'use strict';
  class DrawingEditor{
-  constructor({target,colors,onChange,message,blank,preview}){
+  constructor({target,colors,onChange,message,blank,preview,quantizeOptions=()=>({})}){
+   this.quantizeOptions=quantizeOptions;
    this.target=target;this.preview=preview;this.colors=colors;this.onChange=onChange;this.message=message;this.history=new DrawingLayer.History();this.state=null;this.pending=null;this.gesture=null;this.stamp=null;this.cache=null;this.loadVersion=0;this.selectedId=null;this.nextId=0;
    const $=id=>document.getElementById(id);this.$=$;
    $('drawingEnabled').onchange=()=>{if(this.active&&!this.state)this.message(I18N.t('Bitte zuerst ein Bild laden oder eine leere Zeichenfläche anlegen.'),true);this.cancel();this.refresh();onChange();};
@@ -3530,10 +4036,10 @@ function getImageDataFromImage(idOrElement){
   invalidate(){this.cancel();this.state=null;}
   raster(w,h){
    if(!this.visible||!this.history.position)return null;
-   const key=JSON.stringify([w,h,this.history.version,this.colors()]);if(this.cache?.key===key)return this.cache.pixels;
+   const options=this.quantizeOptions(),key=JSON.stringify([w,h,this.history.version,this.colors(),options]);if(this.cache?.key===key)return this.cache.pixels;
    const canvas=DrawingLayer.render(w,h,this.history.operations),data=canvas.getContext('2d').getImageData(0,0,w,h).data;
    for(let i=3;i<data.length;i+=4)data[i]=data[i]>=128?255:0;
-   const pixels=EP.quantize(data,w,h,this.colors(),{dither:'none'});this.cache={key,pixels};return pixels;
+   const pixels=EP.quantize(data,w,h,this.colors(),{...options,dither:'none'});this.cache={key,pixels};return pixels;
   }
   point(event){const r=this.target.getBoundingClientRect();const x=Math.max(0,Math.min(this.target.width-1,Math.floor((event.clientX-r.left)*this.target.width/r.width)))+.5,y=Math.max(0,Math.min(this.target.height-1,Math.floor((event.clientY-r.top)*this.target.height/r.height)))+.5;return {x,y};}
   operation(point){
@@ -3665,6 +4171,10 @@ function getImageDataFromImage(idOrElement){
   constructor(){this.source=document.createElement('canvas');this.padded=document.createElement('canvas');this.filtered=document.createElement('canvas');this.key=null;this.radius=0;}
   paint(ctx,pixels,amount){
    const radius=Math.max(0,Math.min(4,Number(amount)||0)),{width:w,height:h}=pixels;
+   if(pixels.reflectancePreview){
+    if(this.key!==pixels||this.radius!==radius){const {colors,model}=pixels.reflectancePreview;this.filtered.width=w;this.filtered.height=h;this.filtered.getContext('2d').putImageData(new ImageData(root.Reflectance.preview(pixels.data,w,h,colors,model,radius),w,h),0,0);this.key=pixels;this.radius=radius;}
+    ctx.save();ctx.filter='none';ctx.clearRect(0,0,w,h);ctx.drawImage(this.filtered,0,0);ctx.restore();return;
+   }
    if(!radius){ctx.putImageData(new ImageData(pixels.data,w,h),0,0);return;}
    if(this.key!==pixels||this.radius!==radius){
     this.source.width=w;this.source.height=h;this.source.getContext('2d').putImageData(new ImageData(pixels.data,w,h),0,0);this.filtered.width=w;this.filtered.height=h;
@@ -3768,7 +4278,7 @@ function getImageDataFromImage(idOrElement){
 /* Locally generated data-URL examples, using the actual conversion functions. */
 (function(root){
  'use strict';
- function render(container,colors,t){
+ function render(container,colors,t,renderColors,previewColors,reflectance,previewReflectance){
   container.replaceChildren();const source=document.createElement('canvas');source.width=480;source.height=270;const c=source.getContext('2d');c.fillStyle='white';c.fillRect(0,0,480,270);
   const accent=colors.find(x=>!['#ffffff','#000000'].includes(x))||'#000000';
   for(const [x,a,b]of [[12,'#000000','#ffffff'],[250,'#ffffff',accent]]){const gradient=c.createLinearGradient(x,0,x+210,0);gradient.addColorStop(0,a);gradient.addColorStop(1,b);c.fillStyle=gradient;c.fillRect(x,15,210,120);}
@@ -3777,17 +4287,17 @@ function getImageDataFromImage(idOrElement){
   const image=(data,w,h)=>{const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.getContext('2d').putImageData(new ImageData(data,w,h),0,0);return canvas;};
   const shrink=canvas=>{const out=document.createElement('canvas');out.width=160;out.height=90;const ctx=out.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(canvas,0,0,160,90);return ctx.getImageData(0,0,160,90).data;};
   const input=shrink(source),grid=document.createElement('div');grid.className='methodExampleGrid';container.append(grid);
-  function card(label,description,pixels){const figure=document.createElement('figure'),img=new Image(),caption=document.createElement('figcaption'),name=document.createElement('b'),detail=document.createElement('p');name.textContent=t(label);caption.append(name);detail.textContent=t(description);detail.className='hint';img.src=image(pixels,160,90).toDataURL('image/png');img.alt=t(label);img.width=160;img.height=90;figure.append(caption,img,detail);grid.append(figure);}
+  function card(label,description,pixels,continuous=false){pixels=!continuous&&previewReflectance?Reflectance.preview(pixels,160,90,colors,previewReflectance,0):ColorProfiles.preview({data:pixels,width:160,height:90,continuous},colors,previewColors).data;const figure=document.createElement('figure'),img=new Image(),caption=document.createElement('figcaption'),name=document.createElement('b'),detail=document.createElement('p');name.textContent=t(label);caption.append(name);detail.textContent=t(description);detail.className='hint';img.src=image(pixels,160,90).toDataURL('image/png');img.alt=t(label);img.width=160;img.height=90;figure.append(caption,img,detail);grid.append(figure);}
   for(const [mode,label,description]of [
    ['none','Ohne Dithering','Jeder Bildpunkt wird einer reinen Palettenfarbe zugeordnet.'],
    ['floyd','Floyd–Steinberg','Fehlerverteilung erzeugt feine, unregelmäßige Mischmuster.'],
    ['ordered','Bayer 4 × 4','Regelmäßiges Raster mit abgestuften Farbanteilen.'],
    ['fixed','Feste Mischfarben','Nur reine Farben und feste 1:1-Zweiermischungen in diesem Beispiel.'],
    ['rgb','RGB-Farbstufen','Zwischenfarben bleiben für die spätere Verarbeitung erhalten.'],
-   ['gamut','Palettenfarbraum','Verläufe bleiben erhalten, begrenzt auf Mischfarben der Palette.']])card(label,description,EP.quantize(input,160,90,colors,{dither:mode,strength:1,mixColors:2}).data);
-  const options={dark:50,text:50,smooth:35},prepared=Illustration.prepare(c.getImageData(0,0,480,270).data,480,270,colors,options),base=EP.quantize(input,160,90,colors,{dither:'fixed',mixColors:2});
+   ['gamut','Palettenfarbraum','Verläufe bleiben erhalten, begrenzt auf Mischfarben der Palette.']])card(label,description,EP.quantize(input,160,90,colors,{dither:mode,strength:1,mixColors:2,renderColors,reflectance}).data,['rgb','gamut'].includes(mode));
+  const options={dark:50,text:50,smooth:35},prepared=Illustration.prepare(c.getImageData(0,0,480,270).data,480,270,colors,options),base=EP.quantize(input,160,90,colors,{dither:'fixed',mixColors:2,renderColors,reflectance});
   card('Konturenschutz aus','Dünne schwarze Striche werden wie Farbflächen konvertiert.',base.data);
-  const processed=EP.quantize(shrink(image(prepared.data,480,270)),160,90,colors,{dither:'fixed',mixColors:2});card('Konturen und Text geschützt','Originalstriche werden getrennt verkleinert und rein ausgegeben.',Illustration.apply(processed,Illustration.resizeMasks(prepared,160,90,0,0,160,90),colors,options).data);
+  const processed=EP.quantize(shrink(image(prepared.data,480,270)),160,90,colors,{dither:'fixed',mixColors:2,renderColors,reflectance});card('Konturen und Text geschützt','Originalstriche werden getrennt verkleinert und rein ausgegeben.',Illustration.apply(processed,Illustration.resizeMasks(prepared,160,90,0,0,160,90),colors,options).data);
  }
  root.MethodGuide={render};
 })(window);
@@ -3815,7 +4325,7 @@ function getImageDataFromImage(idOrElement){
   let apFileEntries = [], listedBase = '', listedDirectory = '', currentTemplate = null;
   const busy = new Set();
   let selectedMeta = null, selectedTag = null, connectedBase = '', selectionVersion = 0;
-  let allTags = [], biases = [], drag = null, forceNewCrop = false, mixPage=0, mixPaletteKey='';
+  let allTags = [], biases = [], drag = null, forceNewCrop = false, mixPage=0, mixPaletteKey='', colorProfileEditor=null;
   const defaults = {brightness: 0, contrast: 1, saturation: 1, threshold: 128, strength: 1};
   function message(text, error = false) { $('notice').textContent = text; $('notice').classList.toggle('error', error); Activity.update('image',text,error); }
   function readStore(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
@@ -3834,6 +4344,7 @@ function getImageDataFromImage(idOrElement){
   }
   const colors = () => $('palette').value.startsWith('custom:') ? presets[$('palette').value.slice(7)] : EP.palettes[$('palette').value];
   function paletteChanged() {
+    colorProfileEditor?.paletteChanged();
     populatePatternColors();drawing?.populate();
     const palette = colors(); biases = palette.map(() => 0);
     $('customColors').value = palette.join(', '); $('colors').replaceChildren(); $('biases').replaceChildren();
@@ -3897,6 +4408,7 @@ function getImageDataFromImage(idOrElement){
   const continuousOutput=()=>['rgb','gamut'].includes($('dither').value);
   function schedule() {
     const continuous=continuousOutput(),fixed=$('dither').value==='fixed';
+    colorProfileEditor?.continuous(continuous);
     $('fixedMixControls').hidden=!fixed;
     $('quantizedHint').hidden=continuous||fixed;$('continuousHint').hidden=!continuous;$('apDitherChoice').hidden=!continuous;
     $('strength').disabled=continuous||fixed||$('dither').value==='none';
@@ -3968,7 +4480,7 @@ function getImageDataFromImage(idOrElement){
   async function updateMethodGuide(){
     const version=++guideVersion;if(!$('methodGuide').open)return;
     const activity=Activity.begin('guide',t('Beispiele werden berechnet …'));
-    try{await Activity.nextPaint();if(version===guideVersion&&$('methodGuide').open)MethodGuide.render($('methodExamples'),colors(),t);}
+    try{await Activity.nextPaint();if(version===guideVersion&&$('methodGuide').open)MethodGuide.render($('methodExamples'),colors(),t,colorProfileEditor?.renderColors,colorProfileEditor?.previewColors,colorProfileEditor?.calculation.reflectance,colorProfileEditor?.previewReflectance);}
     catch(error){message(error.message,true);Activity.update('guide',error.message,true);}
     finally{Activity.end(activity,t('Beispiele aktualisiert.'));}
   }
@@ -4013,7 +4525,7 @@ function getImageDataFromImage(idOrElement){
       const enhanced=optimizedSource(rect,dw,dh);
       if(enhanced&&enhanced.options.smooth>0)ctx.drawImage(enhanced.canvas,dx,dy,dw,dh);else ctx.drawImage(image,rect.x,rect.y,rect.w,rect.h,dx,dy,dw,dh);
       const options = Object.fromEntries(Object.keys(defaults).map(id => [id, val(id)]));
-      displayResult = EP.quantize(ctx.getImageData(0, 0, w, h).data, w, h, colors(), {...options, dither: $('dither').value, mixColors:val('mixColors'), biases});
+      displayResult = EP.quantize(ctx.getImageData(0, 0, w, h).data, w, h, colors(), {...options, dither: $('dither').value, mixColors:val('mixColors'), biases, ...colorProfileEditor?.calculation});
       if(enhanced)displayResult=Illustration.apply(displayResult,Illustration.resizeMasks(enhanced.prepared,w,h,dx,dy,dw,dh),colors(),enhanced.options);
       if ($('invert').checked) displayResult = EP.invert(displayResult, colors());
     return {pixels:displayResult,nativeW,nativeH,viewRotation,w,h,dx,dy,dw,dh};
@@ -4203,7 +4715,7 @@ function getImageDataFromImage(idOrElement){
   for (const id of Object.keys(defaults)) $(id).oninput = () => { $(id + 'Value').value = $(id).value; schedule(); };
   $('resetAdjustments').onclick = () => { for (const [id, v] of Object.entries(defaults)) { $(id).value = v; $(id + 'Value').value = v; } $('dither').value = 'none'; $('invert').checked = false; optimizationPreset('off');paletteChanged(); };
   function paintTargetPreview(){
-    if(displayResult){targetPreview.paint(target.getContext('2d'),displayResult,val('targetBlur'));drawing?.decorate();}
+    if(displayResult){targetPreview.paint(target.getContext('2d'),ColorProfiles.preview(displayResult,colors(),colorProfileEditor?.previewColors,colorProfileEditor?.previewReflectance),val('targetBlur'));drawing?.decorate();}
   }
   function updateTargetBlur(){
     const amount=val('targetBlur');target.style.filter='none';target.style.imageRendering=amount>0?'auto':'pixelated';$('targetBlurValue').value=I18N.number(amount,2)+' px';paintTargetPreview();
@@ -4450,12 +4962,14 @@ function getImageDataFromImage(idOrElement){
     if (!validColors(palette)) throw Error(t('Die AP-Farbtabelle kann nicht als Palette übernommen werden.'));
     const black = palette.indexOf('#000000'); if (black > 1) { palette.splice(black, 1); palette.splice(1, 0, '#000000'); }
     presets['AP-Display'] = palette; populatePresets('custom:AP-Display');
+    if($('takeColorProfile').checked)colorProfileEditor.applyAP(selectedMeta,'ap:'+selectedBase()+':'+EPAP.mac(selectedTag.mac));
+    else colorProfileEditor.clearAP();
     $('width').value = selectedMeta.width; $('height').value = selectedMeta.height; aspectRatio = Number(selectedMeta.width) / Number(selectedMeta.height); $('size').value = 'custom'; schedule();
   }
   function updateTagInfo() {
     $('tagInfo').textContent = (selectedMeta.name || 'Display') + ' · ' + selectedMeta.width + ' × ' + selectedMeta.height + ' px · ' + Object.keys(selectedMeta.colortable || {}).length + t(' Farben') + (Number(selectedTag.rotate) || Number(selectedTag.invert) ? t(' · Achtung: Im AP sind zusätzliche Drehung oder Invertierung aktiv; diese können das ausgelieferte Bild erneut verändern.') : '');
   }
-  task('profile', () => { applyProfile(); message(t('Displaygröße und Farbpalette übernommen.')); });
+  task('profile', () => { applyProfile(); const profile=colorProfileEditor.current();message(t('Displaygröße und Farbpalette übernommen.')+($('takeColorProfile').checked?' '+(profile?t('Berechnung mit Farbprofil: {name}',{name:t(profile.name)}):t('Kein aktives Farbprofil; idealisierte Farben werden verwendet.')):'')); });
   async function rawData() { if (!selectedTag) throw Error(t('Bitte ein Display auswählen.')); const response = await EPAP.request(selectedBase(), '/current/' + EPAP.mac(selectedTag.mac) + '.raw'); return response.arrayBuffer(); }
   task('raw', async () => { const name = EPAP.mac(selectedTag.mac); download(new Blob([await rawData()], {type: 'application/octet-stream'}), name + '.raw'); });
   task('read', async () => {
@@ -4491,8 +5005,9 @@ function getImageDataFromImage(idOrElement){
   });
   knownOptions(); if (known[0]) $('apAddress').value = known[0];
   if (['http:', 'https:'].includes(location.protocol) && !['localhost', '127.0.0.1'].includes(location.hostname) && !known[0]) $('apAddress').value = location.origin;
+  colorProfileEditor=new ColorProfileEditor({colors,readStore,saveStore,message,download,t,onChange:()=>{updateMethodGuide();schedule();},onPreview:()=>{paintTargetPreview();updateMethodGuide();}});
   populatePresets();$('testPatternMode').onchange();
-  drawing=new DrawingEditor({target,colors,onChange:updateDrawing,message,blank:()=>{},preview:ctx=>{if(val('targetBlur')>0)targetPreview.paint(ctx,{data:ctx.getImageData(0,0,target.width,target.height).data,width:target.width,height:target.height},val('targetBlur'));}});
+  drawing=new DrawingEditor({target,colors,onChange:updateDrawing,message,blank:()=>{},quantizeOptions:()=>({...colorProfileEditor.calculation,exactNominal:true}),preview:ctx=>{const refs=continuousOutput()?undefined:colorProfileEditor.previewColors;if(!refs&&val('targetBlur')<=0)return;const pixels={data:ctx.getImageData(0,0,target.width,target.height).data,width:target.width,height:target.height,continuous:continuousOutput()};targetPreview.paint(ctx,ColorProfiles.preview(pixels,colors(),refs,colorProfileEditor.previewReflectance),val('targetBlur'));}});
   task('drawingBlank',()=>{
     const odd=val('viewRotation')%180,w=val(odd?'height':'width'),h=val(odd?'width':'height');EP.dimensions(w,h);
     const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h);

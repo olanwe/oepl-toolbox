@@ -58,6 +58,10 @@ From a source checkout, open `img2vlw.html` with `style.css`, `js/` and `vendor/
 
 The 1–4 limit applies to participating display colors **per mixture**, not the total number of tones. For BWRY, a black/yellow pattern can appear olive while the output still contains only actual palette colors. Physical pigment behavior is not calibrated or simulated.
 
+A separate **calculation color profile** uses panel reference colors for matching and dithering while retaining nominal OEPL export codes. Idealized mode preserves existing behavior. Edit custom profiles with color pickers, save locally and exchange JSON files. AP perceptual colors can optionally be adopted alongside its display profile; custom overrides are remembered per display. Preview colors can independently be idealized or profile-based. [Usage, format and limitations](COLOR-PROFILES.md).
+
+The generic BWRY approximation is the only bundled correction preset. Alternatively, use no profile or create and import a custom profile. Profile lightness and the raster response are configurable; unnormalized references remain available for comparison.
+
 Source and output have independent view zoom, mouse/touch navigation and an expandable workspace. Distance preview smooths the native-sized output before display scaling; it never changes exported pixels.
 
 ## Drawing and test charts
@@ -111,3 +115,6 @@ When filing issues, include browser/toolbox version, palette and reproduction st
 ## License
 
 GPL-3.0: [LICENSE](LICENSE). Bundled jpeg-js 0.4.4 encoder: BSD-3-Clause, [vendor/jpeg-js.LICENSE](vendor/jpeg-js.LICENSE). Both license texts are embedded in the standalone HTML.
+
+
+Optional color rendering: the BWRY generic approximation combines approximate solid-color references with an editable fine-pattern response. Select it under Display & Colors → color profile. See [color-profile documentation](COLOR-PROFILES.md) for limitations. Profiles can be copied and exchanged as JSON.
